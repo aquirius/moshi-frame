@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/mguth/Documents/priv/moshi-frame/go-test-backend'
+docker-compose -p go-test-backend down && docker-compose -p go-test-backend_redisfsmilon_1 down
+docker-compose -p go-test-backend up -d && docker-compose -p  go-test-backend_redisfsmilon_1 up -d
+make: Leaving directory '/home/mguth/Documents/priv/moshi-frame/go-test-backend'
+ 
