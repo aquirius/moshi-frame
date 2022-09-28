@@ -1,0 +1,9 @@
+
+CREATE TABLE `greenhouses` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `guid` varchar(36) NOT NULL,
+  `address` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  `zip` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `greenhouses_guid_IDX` (`guid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci

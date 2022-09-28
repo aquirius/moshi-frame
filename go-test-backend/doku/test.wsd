@@ -1,0 +1,106 @@
+@startuml structure
+title "Sprout"
+scale 1 
+left to right direction
+skinparam packageStyle rect
+
+nutrients .. plants
+plants .. pots
+pots .. stacks
+stacks .. greenhouses
+
+class nutrients {
+    id
+
+    carbon
+    hydrogen
+    oxygen
+    nitrogen
+    phosphorus
+    potassium
+    sulfur
+    calcium
+    magnesium
+}
+
+class greenhouses {
+    id
+    guid
+
+    adress
+    zip
+}
+
+class stacks {
+    id
+    suid
+
+    greenhouse_id
+}
+
+class pots {
+    id
+    puid
+
+    stack_id
+    user_id
+}
+
+class plants {
+    id
+    pluid
+
+    created_ts
+    planted_ts
+    harvest_ts
+    price
+
+    nutrient_id
+    pot_id
+}
+
+users .. pots
+invoices .. users
+users .. plans
+
+class users {
+    id
+    uuid
+
+    email
+    password_hash
+    registered_ts
+    last_login_ts
+    status
+    display_name
+    first_name
+    last_name
+    address
+    zip
+    birthday
+    phone
+
+    plan_id
+}
+
+class invoices {
+    id
+    iuid
+
+    subtotal
+    tax
+    total
+    month
+    year
+
+    user_id
+}
+
+class plans {
+    id
+    name
+    settings
+    started_ts
+    end_ts
+}
+@enduml
