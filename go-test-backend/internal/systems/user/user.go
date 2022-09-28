@@ -85,8 +85,9 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodGet:
 		fmt.Println("get users")
 		res, err := users.GetUsersHandler(w, r)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(res, err)
+		if err != nil && err.Error() == "not logged in" {
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -125,7 +126,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.Method == http.MethodGet:
 		fmt.Println("get user")
-
 		res, err := user.GetUserHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -139,6 +139,7 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "login" {
+			fmt.Println("post user login")
 			res, err = user.LoginUserHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -148,9 +149,20 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if method == "register" {
+			fmt.Println("post user register")
 			res, err = user.RegisterUserHandler(w, r)
 			if err != nil {
-				w.WriteHeader(http.StatusBadRequest)
+				if err.Error() == "display name already taken" {
+					w.WriteHeader(http.StatusConflict)
+					w.Write([]byte(err.Error()))
+					return
+				}
+				if err.Error() == "user already registered" {
+					w.WriteHeader(http.StatusConflict)
+					w.Write([]byte(err.Error()))
+					return
+				}
+				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
 				return
 			}

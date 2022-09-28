@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -24,7 +23,7 @@ type RegisterUser struct {
 
 //RegisterUserV1Params
 type RegisterUserV1Params struct {
-	ID          string `json:"uuid"`
+	ID          uint64 `json:"uuid"`
 	DisplayName string `json:"display_name"`
 	FirstName   string `json:"first_name"`
 	LastName    string `json:"last_name"`
@@ -38,25 +37,34 @@ type RegisterUserV1Result struct {
 	User *RegisterUser `json:"user"`
 }
 
-func (l *User) userAlreadyRegistered(id string) bool {
-	var query = "SELECT COUNT(*) FROM users WHERE uuid=?;"
-	_, err := l.dbh.Query(query, id)
-	return err == sql.ErrNoRows
+func (l *User) existingUUID(uuid uint64) bool {
+	var query = "SELECT id FROM users WHERE uuid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, uuid)
+	if err != nil && err == sql.ErrNoRows {
+		return false
+	}
+	return true
 }
 
-func (l *User) displayNameAlreadyUsed(name string) bool {
-	var query = "SELECT COUNT(*) FROM users WHERE display_name=?;"
-	_, err := l.dbh.Query(query, name)
-	return err == sql.ErrNoRows
+func (l *User) existingUsername(name string) bool {
+	var query = "SELECT id FROM users WHERE display_name=?;"
+	var id int
+	err := l.dbh.Get(&id, query, name)
+	if err != nil && err == sql.ErrNoRows {
+		return false
+	}
+	return true
 }
 
 //RegisterUserV1 creates a register user object with given arguments
 func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params, res *RegisterUserV1Result) error {
-	if l.userAlreadyRegistered(p.ID) {
+	if l.existingUUID(p.ID) {
 		return errors.New("user already registered")
 	}
-	if l.displayNameAlreadyUsed(p.DisplayName) {
-		return errors.New("display name already used")
+
+	if l.existingUsername(p.DisplayName) {
+		return errors.New("display name already taken")
 	}
 
 	encrypted := l.encryptPassword(p.Password)
@@ -64,7 +72,6 @@ func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params, res 
 	var query = "INSERT INTO users (uuid, display_name, first_name, last_name, email, birthday, password_hash, registered_ts) VALUES (?,?,?,?,?,?,?,?);"
 	_, err := l.dbh.Exec(query, p.ID, p.DisplayName, p.FirstName, p.LastName, p.Email, p.Birthday, encrypted, time.Now().Unix())
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	return nil

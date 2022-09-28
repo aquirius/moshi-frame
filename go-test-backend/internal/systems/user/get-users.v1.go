@@ -1,12 +1,15 @@
 package user
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
+
+	redis "github.com/go-redis/redis/v8"
 )
 
 //GetUser
@@ -46,15 +49,39 @@ func (l *Users) GetUsersV1(p *GetUsersV1Params) (*GetUsersV1Result, error) {
 func (l *Users) GetUsersHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &GetUsersV1Params{}
 
+	cookie, _ := r.Cookie("session-id")
+	ctx := context.Background()
+	session := SessionUser{}
+
+	//if we have a session id store it to req body
+	if cookie != nil && cookie.Value != "" {
+		var redisSession string
+		var err error
+		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		if err == redis.Nil {
+			fmt.Println("token does not exist")
+		} else if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal([]byte(redisSession), &session)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if !session.Authenticated {
+		return nil, errors.New("not logged in")
+	}
+
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetUsersV1(nil)
 	if err != nil {
 		return nil, err
 	}
-	jsonBytes, err := json.Marshal(res)
+	fmt.Println(res)
+	jsonBytes, err := json.Marshal(&res)
 	if err != nil {
-		log.Fatal("error in json")
 		return nil, err
 	}
 	return jsonBytes, nil

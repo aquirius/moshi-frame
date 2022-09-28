@@ -27,7 +27,7 @@ type SessionUser struct {
 
 // User
 type LoginUser struct {
-	ID string `json:"uuid"`
+	ID uint64 `json:"uuid"`
 }
 
 type LoginUserV1Params struct {
@@ -52,8 +52,9 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 	var redisSession string
 	var err error
 
-	//generate random id
-	sessionID = l.generateSessionID()
+	if !l.existingUsername(p.Username) {
+		return nil, errors.New("display name does not exist")
+	}
 
 	if p.SessionID != nil {
 		redisSession, err = l.rdb.Get(ctx, *p.SessionID).Result()
@@ -64,8 +65,9 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 		}
 		//overwrite generated id if we have already one from request
 		sessionID = *p.SessionID
+	} else {
+		sessionID = l.generateSessionID()
 	}
-	ctx.Done()
 
 	//set our redis context
 	ctx = context.WithValue(ctx, sessionID, redisSession)
@@ -88,7 +90,7 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 	session.Authenticated = true
 
 	//connect user with newly generated session id
-	err = l.rdb.Set(ctx, sessionID, session, 180*time.Second).Err()
+	err = l.rdb.Set(ctx, sessionID, session, 24*60*60*time.Second).Err()
 	if err != nil {
 		panic(err)
 	}
@@ -103,10 +105,11 @@ func (l *User) LoginUserHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
+
 	ctx := context.Background()
 
 	//if we have a session id store it to req body
-	if cookie != nil && cookie.Value != "" {
+	if req.SessionID == nil && (cookie != nil && cookie.Value != "") {
 		req.SessionID = &cookie.Value
 	}
 
@@ -119,18 +122,16 @@ func (l *User) LoginUserHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	addSessionCookie := &http.Cookie{
 		Name:   "session-id",
 		Value:  session.SessionID,
-		MaxAge: 180,
+		MaxAge: 24 * 60 * 60,
 	}
-
 	http.SetCookie(w, addSessionCookie)
 
-	//if we get a session id from login we store it as cookie
+	//if we get a user id from login we store it as cookie
 	addUserIDCookie := &http.Cookie{
 		Name:   "uuid",
 		Value:  session.UUID,
-		MaxAge: 180,
+		MaxAge: 24 * 60 * 60,
 	}
-
 	http.SetCookie(w, addUserIDCookie)
 
 	jsonBytes, err := json.Marshal(session)
