@@ -1,4 +1,4 @@
-package plant
+package greenhouse
 
 import (
 	"context"
@@ -15,55 +15,40 @@ import (
 )
 
 //GetUser
-type GetPlant struct {
-	UUID        string `db:"uuid"`
-	TS          string `db:"registered_ts"`
-	DisplayName string `db:"display_name"`
-	FirstName   string `db:"first_name"`
-	LastName    string `db:"last_name"`
-	Email       string `db:"email"`
-	Birthday    string `db:"birthday"`
-}
-
-type Greenhouse struct {
-}
-
-//GetUser
-type GetGreenhouse struct {
+type GetGreenhouses struct {
 	GUID    uint64 `db:"guid"`
 	Address string `db:"address"`
 	Zip     uint64 `db:"zip"`
 }
 
 //GetUserV1Params
-type GetGreenhouseV1Params struct {
+type GetGreenhousesV1Params struct {
 	UUID uint64 `json:"uuid"`
 }
 
 //GetUserV1Result
-type GetGreenhouseV1Result struct {
-	Greenhouse []GetGreenhouse `json:"greenhouse"`
+type GetGreenhousesV1Result struct {
+	Greenhouses []GetGreenhouses `json:"greenhouses"`
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Params) (*GetGreenhouseV1Result, error) {
+func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1Params) (*GetGreenhousesV1Result, error) {
 
 	userID := l.getUserID(p.UUID)
 	greenhouses := []uint64{}
-	v := ctx.Value("user_id")
+	v := ctx.Value("greenhouse_id")
 	err := l.dbh.Select(&greenhouses, "SELECT greenhouse_id FROM users_greenhouses WHERE user_id=?;", userID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")
 		return nil, err
 	}
 
-	fmt.Println("context user_id", v, userID, greenhouses)
+	fmt.Println("get greenhouses", v, len(greenhouses))
 
-	getGreenhouses := []GetGreenhouse{}
+	getGreenhouses := []GetGreenhouses{}
 	for _, v := range greenhouses {
-		res := []GetGreenhouse{}
+		res := []GetGreenhouses{}
 		err = l.dbh.Select(&res, "SELECT guid, address, zip FROM greenhouses WHERE id=?;", v)
-		fmt.Println(&getGreenhouses, &res)
 		if err == sql.ErrNoRows {
 			fmt.Println("no rows")
 			return nil, err
@@ -71,13 +56,11 @@ func (l *Plant) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Params) (
 		getGreenhouses = append(getGreenhouses, res...)
 	}
 
-	fmt.Println("context user_id", v, userID, getGreenhouses)
-
-	return &GetGreenhouseV1Result{Greenhouse: getGreenhouses}, nil
+	return &GetGreenhousesV1Result{Greenhouses: getGreenhouses}, nil
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) GetGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Greenhouses) GetGreenhousesHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
@@ -97,12 +80,12 @@ func (l *Plant) GetGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]
 
 	fmt.Println("redisSession", vars["uuid"], redisSession)
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
-	req := &GetGreenhouseV1Params{
+	req := &GetGreenhousesV1Params{
 		UUID: uuid,
 	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
-	res, err := l.GetGreenhouseV1(ctx, req)
+	res, err := l.GetGreenhousesV1(ctx, req)
 	if err != nil {
 		return nil, err
 	}

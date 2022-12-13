@@ -41,10 +41,11 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get plants")
-		res, err := plant.GetGreenhouseHandler(w, r)
+		fmt.Println("get stacks")
+		res, err := plant.GetStacksHandler(w, r)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(err.Error()))
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -55,8 +56,8 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post plant add")
-			res, err = plant.AddGreenhouseHandler(w, r)
+			fmt.Println("post stack add")
+			res, err = plant.AddStackHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))

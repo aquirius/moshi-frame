@@ -63,7 +63,29 @@ func (l *Plant) getUserID(uuid uint64) int {
 	var query = "SELECT id FROM users WHERE uuid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println("getuser", uuid, err, id)
+	fmt.Println("plant getuser", uuid, err, id)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
+func (l *Plant) getStackID(suid uint64) int {
+	var query = "SELECT id FROM stacks WHERE suid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, suid)
+	fmt.Println("plant getstack", suid, err, id)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
+func (l *Plant) getGreenhouseID(guid uint64) int {
+	var query = "SELECT id FROM greenhouses WHERE guid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, guid)
+	fmt.Println("getgreenhouse", guid, err, id)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}
@@ -74,9 +96,6 @@ func (l *Plant) getUserID(uuid uint64) int {
 func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV1Result, error) {
 	pluid, err := uuid.NewUUID()
 	puid, err := uuid.NewUUID()
-	suid, err := uuid.NewUUID()
-	guid, err := uuid.NewUUID()
-	uguid, err := uuid.NewUUID()
 
 	//userID := ctx.Value("user_id")
 
@@ -93,34 +112,8 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 		return nil, err
 	}
 
-	query = "INSERT INTO greenhouses (guid, address, zip) VALUES (?,?,?);"
-	result, err = l.dbh.Exec(query, guid.ID(), "test", 98806)
-	if err != nil {
-		return nil, err
-	}
-	greenhouseID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-
-	query = "INSERT INTO users_greenhouses (uguid, user_id, greenhouse_id) VALUES (?,?,?);"
-	_, err = l.dbh.Exec(query, uguid.ID(), userID, greenhouseID)
-	if err != nil {
-		return nil, err
-	}
-
-	query = "INSERT INTO stacks (suid, greenhouse_id) VALUES (?,?);"
-	result, err = l.dbh.Exec(query, suid.ID(), greenhouseID)
-	if err != nil {
-		return nil, err
-	}
-	stackID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-
 	query = "INSERT INTO pots (puid, stack_id, user_id) VALUES (?,?,?);"
-	result, err = l.dbh.Exec(query, puid.ID(), stackID, 1)
+	result, err = l.dbh.Exec(query, puid.ID(), 0, 1)
 	if err != nil {
 		return nil, err
 	}

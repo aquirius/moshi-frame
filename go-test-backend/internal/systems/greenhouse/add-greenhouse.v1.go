@@ -1,4 +1,4 @@
-package plant
+package greenhouse
 
 import (
 	"context"
@@ -32,7 +32,7 @@ type AddGreenhouseV1Result struct {
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Params) (*AddGreenhouseV1Result, error) {
+func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Params) (*AddGreenhouseV1Result, error) {
 
 	guid, err := uuid.NewUUID()
 	uguid, err := uuid.NewUUID()
@@ -62,7 +62,7 @@ func (l *Plant) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Params) (
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) AddGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
