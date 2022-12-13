@@ -12,6 +12,6 @@ CREATE TABLE `users` (
   `last_name` varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '',
   `birthday` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `accounts_email_IDX` (`email`) USING BTREE,
-  UNIQUE KEY `accounts_uuid_IDX` (`uuid`) USING BTREE
+  UNIQUE KEY `users_email_IDX` (`email`) USING BTREE,
+  UNIQUE KEY `users_uuid_IDX` (`uuid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci

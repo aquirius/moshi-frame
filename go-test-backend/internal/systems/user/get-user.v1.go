@@ -27,7 +27,8 @@ type GetUserV1Result struct {
 func (l *User) GetUserV1(ctx context.Context, p *GetUserV1Params) (*GetUserV1Result, error) {
 	user := GetUser{}
 	v := ctx.Value("session-id")
-	fmt.Println(v)
+	fmt.Println(v, p)
+
 	err := l.dbh.Get(&user, "SELECT uuid, registered_ts, display_name, first_name, last_name, email, birthday FROM users WHERE uuid=?", p.UUID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")

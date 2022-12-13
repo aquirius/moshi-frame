@@ -27,8 +27,9 @@ func NewServerProvider() *ServerProvider {
 func (b *ServerProvider) NewServer() *Server {
 	b.Server.Sql = *b.Server.connectSQL()
 	b.Server.Redis = *redis.NewClient(&redis.Options{
+		Username: "default",
 		Addr:     "127.0.0.1:6379",
-		Password: "milon",
+		Password: "moshi",
 		DB:       1,
 	})
 	return b.Server

@@ -151,6 +151,7 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if method == "register" {
 			fmt.Println("post user register")
 			res, err = user.RegisterUserHandler(w, r)
+			fmt.Println(res, err)
 			if err != nil {
 				if err.Error() == "display name already taken" {
 					w.WriteHeader(http.StatusConflict)

@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	httpAddr          = getenv("MILON_ADDR", "127.0.0.1:3000")
-	mysqlDSN          = getenv("MILON_MYSQL", "milon:milon@tcp(127.0.0.1:3311)/milon")
-	urlPrefixBackend  = getenv("MILON_URL_PREFIX_BACKEND", "http://127.0.0.1:3006")
-	urlPrefixFrontend = getenv("MILON_URL_PREFIX_FRONTEND", "http://127.0.0.1:3000")
-	fsPath            = getenv("MILON_FS_PATH", "uploads")
+	httpAddr          = getenv("SPROUT_ADDR", "127.0.0.1:3000")
+	mysqlDSN          = getenv("SPROUT_MYSQL", "root:moshi@tcp(127.0.0.1:3311)/sprout")
+	urlPrefixBackend  = getenv("SPROUT_URL_PREFIX_BACKEND", "http://127.0.0.1:3006")
+	urlPrefixFrontend = getenv("SPROUT_URL_PREFIX_FRONTEND", "http://127.0.0.1:3000")
+	fsPath            = getenv("SPROUT_FS_PATH", "uploads")
 )
 
 func getenv(key string, fallback string) string {

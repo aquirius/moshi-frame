@@ -1,24 +1,24 @@
 version: "3.3"
 services:
-  sqlfsmilon:
-    image: mysql/mysql-server:5.7
-    container_name: go-test-backend
+  sqlfssprout:
+    image: mysql/mysql-server:5.6
+    container_name: sprout-backend
     restart: unless-stopped
     ports:
       - "3311:3306"
     environment:
-      - MYSQL_DATABASE=milon
-      - MYSQL_USER=milon
-      - MYSQL_PASSWORD=milon
-      - MYSQL_ROOT_PASSWORD=milon
+      - MYSQL_DATABASE=sprout
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=moshi
+      - MYSQL_ROOT_PASSWORD=moshi
       - MYSQL_ROOT_HOST=%
     command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
 
-  redisfsmilon:
+  redisfssprout:
     image: redis:latest
     restart: unless-stopped
     ports:
       - "6379:6379"
     environment:
       - REDIS_REPLICATION_MODE=master
-    command: "redis-server --requirepass milon --port 6379"
+    command: "redis-server --requirepass moshi --port 6379"

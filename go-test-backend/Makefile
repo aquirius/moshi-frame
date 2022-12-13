@@ -1,9 +1,9 @@
 clean:
-	docker-compose -p go-test-backend down && docker-compose -p go-test-backend_redisfsmilon_1 down
-	docker-compose -p go-test-backend up -d && docker-compose -p  go-test-backend_redisfsmilon_1 up -d
+	docker-compose -p sprout-backend down && docker-compose -p sprout-backend_redisfssprout_1 down
+	docker-compose -p sprout-backend up -d && docker-compose -p  sprout-backend_redisfssprout_1 up -d
 
 run:
-	MILON_MYSQL="milon:milon@tcp(127.0.0.1:3311)/milon?collation=utf8_general_ci" \
+	SPROUT_MYSQL="root:moshi@tcp(127.0.0.1:3311)/sprout?collation=utf8_general_ci" \
 	go run ./main.go
 
 test-user:

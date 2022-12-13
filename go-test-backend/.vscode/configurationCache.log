@@ -1,1 +1,1 @@
-{"buildTargets":["clean","load-schemas","run","test-all","test-user"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
+{"buildTargets":["clean","load-schemas","make","run","test-all","test-user"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

@@ -18,7 +18,6 @@ func TestRegisterUserV1(t *testing.T) {
 	sqlxDB := sqlx.NewDb(db, "sqlmock")
 
 	mockUser := &user.RegisterUserV1Params{
-		ID:          12341,
 		DisplayName: "test",
 		FirstName:   "test",
 		LastName:    "test",
@@ -29,7 +28,6 @@ func TestRegisterUserV1(t *testing.T) {
 
 	mockResult := &user.RegisterUserV1Result{
 		User: &user.RegisterUser{
-			ID:          12341,
 			DisplayName: "test",
 			FirstName:   "test",
 			LastName:    "test",

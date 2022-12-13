@@ -20,6 +20,7 @@ type DBUser struct {
 }
 
 type SessionUser struct {
+	ID            uint64 `db:"uuid"`
 	UUID          string `db:"uuid"`
 	Password      string `db:"password_hash"`
 	Authenticated bool
@@ -74,9 +75,9 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 
 	var session SessionUser
 	//get password hash from sql and check params
-	err = l.dbh.Get(&session, "SELECT uuid, password_hash FROM users WHERE display_name=?;", p.Username)
+	err = l.dbh.Get(&session, "SELECT id, uuid, password_hash FROM users WHERE display_name=?;", p.Username)
 	if err != nil {
-		panic(err)
+		return nil, errors.New("no user found")
 	}
 
 	//check password encryption
@@ -90,10 +91,14 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 	session.Authenticated = true
 
 	//connect user with newly generated session id
-	err = l.rdb.Set(ctx, sessionID, session, 24*60*60*time.Second).Err()
+	res, err := l.rdb.Set(ctx, sessionID, session, 24*60*60*time.Second).Result()
+	fmt.Println(res, err)
 	if err != nil {
-		panic(err)
+		return nil, errors.New("redis err saving session")
 	}
+
+	ctx = context.WithValue(ctx, "user_id", session.ID)
+
 	return &LoginUserV1Result{UUID: session.UUID, SessionID: sessionID}, nil
 }
 
@@ -108,12 +113,16 @@ func (l *User) LoginUserHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 
 	ctx := context.Background()
 
+	fmt.Println(req)
+
 	//if we have a session id store it to req body
 	if req.SessionID == nil && (cookie != nil && cookie.Value != "") {
 		req.SessionID = &cookie.Value
 	}
 
 	session, err := l.LoginUserV1(ctx, req)
+
+	fmt.Println(session)
 	if err != nil {
 		return nil, err
 	}

@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os/exec"
-	"path/filepath"
 	"strings"
 )
 
 var dbName string
 
 func init() {
-	flag.StringVar(&dbName, "db", "milon", "milon")
+	flag.StringVar(&dbName, "db", "sprout", "moshi")
 	flag.Parse()
 }
 
@@ -47,22 +46,43 @@ func run(name string, cmds []string, stdin []byte) error {
 }
 
 func main() {
-	users, err := filepath.Abs("./schemas/users.sql")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	if len(users) <= 0 {
-		fmt.Errorf("no users schema found")
-	}
 	out := []string{}
 
-	c, err := ioutil.ReadFile(users)
+	greenhouse, err := ioutil.ReadFile("./schemas/greenhouses.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	userGreenhouse, err := ioutil.ReadFile("./schemas/users_greenhouses.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	nutrients, err := ioutil.ReadFile("./schemas/nutrients.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	plans, err := ioutil.ReadFile("./schemas/plans.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	plants, err := ioutil.ReadFile("./schemas/plants.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	pots, err := ioutil.ReadFile("./schemas/pots.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	stacks, err := ioutil.ReadFile("./schemas/stacks.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	users, err := ioutil.ReadFile("./schemas/users.sql")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	out = append(out, string(c))
+	out = append(out, string(greenhouse), string(nutrients), string(plans), string(plants), string(pots), string(stacks), string(users), string(userGreenhouse))
+
 	s := ""
 	for _, v := range out {
 		s += v
@@ -80,13 +100,13 @@ func main() {
 	if err := run("docker", []string{
 		"exec",
 		"-i",
-		"go-test-backend",
+		"sprout-backend",
 		"mysql",
-		"-umilon",
-		"-pmilon",
-		"milon",
+		"-uroot",
+		"-pmoshi",
+		"sprout",
 	}, []byte(s)); err != nil {
-		fmt.Errorf("failed to load milon sql schemas: %w", err)
+		fmt.Errorf("failed to load sprout sql schemas: %w", err)
 	}
 
 }
