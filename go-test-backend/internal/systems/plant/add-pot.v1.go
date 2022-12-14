@@ -26,7 +26,7 @@ type AddPotV1Params struct {
 
 //GetUserV1Result
 type AddPotV1Result struct {
-	Pot AddPot `json:"Pot"`
+	Pot AddPot `json:"pot"`
 }
 
 //GetUserV1 gets user by uuid

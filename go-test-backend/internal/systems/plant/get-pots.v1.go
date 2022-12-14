@@ -27,25 +27,24 @@ type GetPotsV1Result struct {
 
 //GetUserV1 gets user by uuid
 func (l *Plant) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Result, error) {
-	Pots := []uint64{}
-	v := ctx.Value("Pots_id")
+	pots := []uint64{}
+	v := ctx.Value("pots_id")
 	stackID := l.getStackID(p.SUID)
-	fmt.Println("get pots", p.SUID, stackID)
-	err := l.dbh.Select(&Pots, "SELECT puid FROM pots WHERE stack_id=?;", stackID)
+	err := l.dbh.Select(&pots, "SELECT puid FROM pots WHERE stack_id=?;", stackID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")
 		return nil, err
 	}
 
 	getPots := []GetPots{}
-	for _, v := range Pots {
+	for _, v := range pots {
 		res := GetPots{
 			PUID: v,
 		}
 		getPots = append(getPots, res)
 	}
 
-	fmt.Println("context Pots_id", v, Pots)
+	fmt.Println("context pots_id", v, pots)
 
 	return &GetPotsV1Result{Pots: getPots}, nil
 }

@@ -107,7 +107,7 @@ func main() {
 			var res []byte
 			var err error
 			if method == "add" {
-				fmt.Println("post get stack add")
+				fmt.Println("post get pots")
 				res, err = rt.plant.GetPotsHandler(w, r)
 				if err != nil {
 					w.WriteHeader(http.StatusUnauthorized)
