@@ -52,7 +52,7 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-	userGreenhouse, err := ioutil.ReadFile("./schemas/users_greenhouses.sql")
+	userGreenhouse, err := ioutil.ReadFile("./schemas/users-greenhouses.sql")
 	if err != nil {
 		panic(err.Error())
 	}

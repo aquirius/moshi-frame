@@ -40,7 +40,7 @@ func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Par
 	userID := l.getUserID(p.UUID)
 
 	query := "INSERT INTO greenhouses (guid, address, zip) VALUES (?,?,?);"
-	result, err := l.dbh.Exec(query, guid.ID(), "test", 98806)
+	result, err := l.dbh.Exec(query, guid.ID(), p.Adress, p.Zip)
 	if err != nil {
 		return nil, err
 	}
@@ -54,11 +54,11 @@ func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Par
 	if err != nil {
 		return nil, err
 	}
-	res := &AddGreenhouse{
+	res := AddGreenhouse{
 		GUID: uint64(guid.ID()),
 	}
 
-	return &AddGreenhouseV1Result{Greenhouse: *res}, nil
+	return &AddGreenhouseV1Result{Greenhouse: res}, nil
 }
 
 //GetUserHandler handles get user request
@@ -80,14 +80,21 @@ func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Reques
 		}
 	}
 
-	fmt.Println("redisSession", vars["uuid"], redisSession)
+	fmt.Println("redisSession add greenhouse", vars["uuid"], redisSession)
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
+	zip := 88965
 	req := &AddGreenhouseV1Params{
-		UUID: uuid,
+		UUID:   uuid,
+		Adress: "Hinterdupfing",
+		Zip:    int16(zip),
 	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
+	fmt.Println("add greenhouse req", req)
+
 	res, err := l.AddGreenhouseV1(ctx, req)
+	fmt.Println("add greenhouse err", res, err)
+
 	if err != nil {
 		return nil, err
 	}

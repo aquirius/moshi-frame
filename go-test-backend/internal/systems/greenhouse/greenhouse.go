@@ -146,6 +146,7 @@ func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		method := r.Header.Get("Method")
 		var res []byte
 		var err error
+		fmt.Println(res, err)
 		if method == "add" {
 			fmt.Println("post Greenhouse add")
 			res, err = b.AddGreenhouseHandler(w, r)
