@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -15,12 +14,7 @@ import (
 
 // RegisterUser
 type RegisterUser struct {
-	DisplayName string `json:"display_name"`
-	FirstName   string `json:"first_name"`
-	LastName    string `json:"last_name"`
-	Email       string `json:"email"`
-	Birthday    uint64 `json:"birthday"`
-	Password    string `json:"password"`
+	UUID uint64 `json:uuid`
 }
 
 //RegisterUserV1Params
@@ -43,7 +37,6 @@ func (l *User) existingUUID(uuid uint32) bool {
 	var query = "SELECT id FROM users WHERE uuid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println(err)
 	if err != nil && err == sql.ErrNoRows {
 		return false
 	}
@@ -61,18 +54,18 @@ func (l *User) existingUsername(name string) bool {
 }
 
 //RegisterUserV1 creates a register user object with given arguments
-func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params, res *RegisterUserV1Result) error {
+func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params) (*RegisterUserV1Result, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if l.existingUUID(uuid.ID()) {
-		return errors.New("user already registered")
+		return nil, errors.New("user already registered")
 	}
 
 	if l.existingUsername(p.DisplayName) {
-		return errors.New("display name already taken")
+		return nil, errors.New("display name already taken")
 	}
 
 	encrypted := l.encryptPassword(p.Password)
@@ -80,9 +73,12 @@ func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params, res 
 	var query = "INSERT INTO users (uuid, display_name, first_name, last_name, email, birthday, password_hash, registered_ts) VALUES (?,?,?,?,?,?,?,?);"
 	_, err = l.dbh.Exec(query, uuid.ID(), p.DisplayName, p.FirstName, p.LastName, p.Email, p.Birthday, encrypted, time.Now().Unix())
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	res := &RegisterUser{
+		UUID: uint64(uuid.ID()),
+	}
+	return &RegisterUserV1Result{User: res}, nil
 }
 
 //RegisterUserHandler handles register user request
@@ -96,7 +92,7 @@ func (l *User) RegisterUserHandler(w http.ResponseWriter, r *http.Request) ([]by
 
 	ctx := context.Background()
 
-	err := l.RegisterUserV1(ctx, req, res)
+	res, err := l.RegisterUserV1(ctx, req)
 	if err != nil {
 		return nil, err
 	}

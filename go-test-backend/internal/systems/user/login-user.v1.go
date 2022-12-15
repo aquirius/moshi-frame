@@ -20,7 +20,7 @@ type DBUser struct {
 }
 
 type SessionUser struct {
-	ID            uint64 `db:"uuid"`
+	ID            uint64 `db:"id"`
 	UUID          string `db:"uuid"`
 	Password      string `db:"password_hash"`
 	Authenticated bool
@@ -91,8 +91,7 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 	session.Authenticated = true
 
 	//connect user with newly generated session id
-	res, err := l.rdb.Set(ctx, sessionID, session, 24*60*60*time.Second).Result()
-	fmt.Println(res, err)
+	_, err = l.rdb.Set(ctx, sessionID, session, 24*60*60*time.Second).Result()
 	if err != nil {
 		return nil, errors.New("redis err saving session")
 	}
@@ -112,17 +111,12 @@ func (l *User) LoginUserHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	json.Unmarshal(reqBody, req)
 
 	ctx := context.Background()
-
-	fmt.Println(req)
-
 	//if we have a session id store it to req body
 	if req.SessionID == nil && (cookie != nil && cookie.Value != "") {
 		req.SessionID = &cookie.Value
 	}
 
 	session, err := l.LoginUserV1(ctx, req)
-
-	fmt.Println(session)
 	if err != nil {
 		return nil, err
 	}
