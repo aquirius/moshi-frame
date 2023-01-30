@@ -1,5 +1,6 @@
 make --dry-run --always-make --keep-going --print-directory
 make: Entering directory '/home/moshi/projects/sprout/moshi-frame/go-test-backend'
+ 
 docker-compose -p sprout-backend down && docker-compose -p sprout-backend_redisfssprout_1 down
 docker-compose -p sprout-backend up -d && docker-compose -p  sprout-backend_redisfssprout_1 up -d
 make: Leaving directory '/home/moshi/projects/sprout/moshi-frame/go-test-backend'
