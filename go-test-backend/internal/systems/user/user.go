@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,6 +33,19 @@ type User struct {
 type Users struct {
 	dbh *sqlx.DB
 	rdb *redis.Client
+}
+
+type DBUser struct {
+	UUID          uint64 `db:"uuid"`
+	Password      string `db:"password"`
+	Authenticated bool
+}
+
+type SessionUser struct {
+	ID            uint64 `db:"id"`
+	UUID          string `db:"uuid"`
+	Password      string `db:"password_hash"`
+	Authenticated bool
 }
 
 // NewUserProvider returns a new User provider
@@ -76,6 +90,10 @@ func (c *User) encryptPassword(pw string) string {
 	return fmt.Sprintf("%x", crypt.Sum(nil))
 }
 
+func (c SessionUser) MarshalBinary() ([]byte, error) {
+	return json.Marshal(c)
+}
+
 //serves users methods
 func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
@@ -85,7 +103,6 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodGet:
 		fmt.Println("get users")
 		res, err := users.GetUsersHandler(w, r)
-		fmt.Println(res, err)
 		if err != nil && err.Error() == "not logged in" {
 			w.WriteHeader(http.StatusUnauthorized)
 			return
@@ -127,7 +144,11 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodGet:
 		fmt.Println("get user")
 		res, err := user.GetUserHandler(w, r)
-		if err != nil {
+		if err != nil && err.Error() == "not logged in" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		if err != nil && err.Error() == "not found" {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -141,6 +162,16 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if method == "login" {
 			fmt.Println("post user login")
 			res, err = user.LoginUserHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
+		}
+
+		if method == "logout" {
+			fmt.Println("post user logout")
+			res, err = user.LogoutUserHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))

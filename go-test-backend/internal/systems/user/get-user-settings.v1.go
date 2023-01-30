@@ -62,6 +62,8 @@ func (l *User) GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) ([
 		} else if err != nil {
 			panic(err)
 		}
+	} else {
+		return nil, errors.New("not logged in")
 	}
 
 	json.Unmarshal([]byte(redisSession), &redisJson)

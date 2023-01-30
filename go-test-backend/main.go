@@ -73,6 +73,7 @@ func main() {
 	greenhousesH := rt.greenhouses
 
 	mux.HandleFunc("/login", userH.ServeHTTP)
+	mux.HandleFunc("/logout", userH.ServeHTTP)
 	mux.HandleFunc("/register", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse", greenhousesH.ServeHTTP)

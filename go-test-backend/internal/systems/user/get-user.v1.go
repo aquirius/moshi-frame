@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -55,6 +56,8 @@ func (l *User) GetUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, e
 		} else if err != nil {
 			panic(err)
 		}
+	} else {
+		return nil, errors.New("not logged in")
 	}
 
 	fmt.Println("redisSession", redisSession)

@@ -32,10 +32,9 @@ func (l *Plant) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Re
 	stackID := l.getStackID(p.SUID)
 	err := l.dbh.Select(&pots, "SELECT puid FROM pots WHERE stack_id=?;", stackID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
+		fmt.Println("no rows for get pots")
 		return nil, err
 	}
-
 	getPots := []GetPots{}
 	for _, v := range pots {
 		res := GetPots{
@@ -44,7 +43,7 @@ func (l *Plant) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Re
 		getPots = append(getPots, res)
 	}
 
-	fmt.Println("context pots_id", v, pots)
+	fmt.Println("get pots", v, pots)
 
 	return &GetPotsV1Result{Pots: getPots}, nil
 }
@@ -56,6 +55,7 @@ func (l *Plant) GetPotsHandler(w http.ResponseWriter, r *http.Request) ([]byte, 
 	req := &GetPotsV1Params{}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
+	fmt.Println(req)
 	res, err := l.GetPotsV1(ctx, req)
 	if err != nil {
 		return nil, err

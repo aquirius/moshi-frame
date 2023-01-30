@@ -36,7 +36,7 @@ func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStac
 	greenhouseID := l.getGreenhouseID(p.GUID)
 	err := l.dbh.Select(&stacks, "SELECT suid FROM stacks WHERE greenhouse_id=?;", greenhouseID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
+		fmt.Println("no rows for get stacks")
 		return nil, err
 	}
 
@@ -48,7 +48,7 @@ func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStac
 		getStacks = append(getStacks, res)
 	}
 
-	fmt.Println("context Stacks_id", v, stacks)
+	fmt.Println("get stacks ", v, stacks)
 
 	return &GetStacksV1Result{Stacks: getStacks}, nil
 }
@@ -58,7 +58,6 @@ func (l *Plant) GetStacksHandler(w http.ResponseWriter, r *http.Request) ([]byte
 	vars := mux.Vars(r)
 	ctx := context.Background()
 
-	fmt.Println("get Stacks vars", vars["guid"], vars["uuid"])
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 	guid, _ := strconv.ParseUint(vars["guid"], 0, 32)
 

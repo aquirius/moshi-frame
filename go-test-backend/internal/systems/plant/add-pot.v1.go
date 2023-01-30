@@ -31,10 +31,11 @@ type AddPotV1Result struct {
 
 //GetUserV1 gets user by uuid
 func (l *Plant) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Result, error) {
-
 	puid, err := uuid.NewUUID()
 	userID := l.getUserID(p.UUID)
 	stackID := l.getStackID(p.SUID)
+
+	fmt.Println("add pot params : ", p)
 
 	query := "INSERT INTO pots (puid, stack_id, user_id) VALUES (?,?,?);"
 	_, err = l.dbh.Exec(query, puid.ID(), stackID, userID)
@@ -60,7 +61,6 @@ func (l *Plant) AddPotHandler(w http.ResponseWriter, r *http.Request) ([]byte, e
 	}
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
-	fmt.Println(req)
 	res, err := l.AddPotV1(ctx, req)
 	if err != nil {
 		return nil, err

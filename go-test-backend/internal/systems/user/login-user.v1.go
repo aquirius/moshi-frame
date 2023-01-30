@@ -13,19 +13,6 @@ import (
 	redis "github.com/go-redis/redis/v8"
 )
 
-type DBUser struct {
-	UUID          uint64 `db:"uuid"`
-	Password      string `db:"password"`
-	Authenticated bool
-}
-
-type SessionUser struct {
-	ID            uint64 `db:"id"`
-	UUID          string `db:"uuid"`
-	Password      string `db:"password_hash"`
-	Authenticated bool
-}
-
 // User
 type LoginUser struct {
 	ID uint64 `json:"uuid"`
@@ -40,10 +27,6 @@ type LoginUserV1Params struct {
 type LoginUserV1Result struct {
 	UUID      string `json:"uuid"`
 	SessionID string `json:"session_id"`
-}
-
-func (c SessionUser) MarshalBinary() ([]byte, error) {
-	return json.Marshal(c)
 }
 
 //LoginUserV1 verifys user login
