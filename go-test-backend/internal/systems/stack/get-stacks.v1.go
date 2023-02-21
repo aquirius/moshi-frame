@@ -1,4 +1,4 @@
-package plant
+package stack
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"test-backend/m/v2/internal/systems/greenhouse"
 
 	"github.com/gorilla/mux"
 )
@@ -29,10 +30,12 @@ type GetStacksV1Result struct {
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStacksV1Result, error) {
+func (l *Stack) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStacksV1Result, error) {
 	stacks := []uint64{}
 	//_ = ctx.Value("stacks_id")
-	greenhouseID := l.getGreenhouseID(p.GUID)
+	greenhouse := greenhouse.NewGreenhouseProvider(ctx, l.dbh, l.rdb, "")
+	greenhouseID := greenhouse.Greenhouse.GetGreenhouseID(p.GUID)
+
 	err := l.dbh.Select(&stacks, "SELECT suid FROM stacks WHERE greenhouse_id=?;", greenhouseID)
 	if err == sql.ErrNoRows {
 		return nil, err
@@ -50,7 +53,7 @@ func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStac
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) GetStacksHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Stack) GetStacksHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	ctx := context.Background()
 

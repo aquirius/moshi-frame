@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"crypto/rand"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -92,6 +93,16 @@ func (c *User) encryptPassword(pw string) string {
 
 func (c SessionUser) MarshalBinary() ([]byte, error) {
 	return json.Marshal(c)
+}
+
+func (l *User) GetUserID(uuid uint64) int {
+	var query = "SELECT id FROM users WHERE uuid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, uuid)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
 }
 
 //serves users methods

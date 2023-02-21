@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"test-backend/m/v2/internal/systems/user"
 
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -36,8 +37,8 @@ func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Par
 
 	guid, err := uuid.NewUUID()
 	uguid, err := uuid.NewUUID()
-
-	userID := l.getUserID(p.UUID)
+	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
+	userID := user.User.GetUserID(p.UUID)
 
 	query := "INSERT INTO greenhouses (guid, address, zip) VALUES (?,?,?);"
 	result, err := l.dbh.Exec(query, guid.ID(), p.Adress, p.Zip)

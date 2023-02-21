@@ -2,6 +2,7 @@ package plant
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -34,35 +35,30 @@ func (b *PlantProvider) NewPlant() *Plant {
 	return b.Plant
 }
 
+func (l *Plant) GetPlantID(pluid uint64) int {
+	var query = "SELECT id FROM greenhouse WHERE guid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, pluid)
+	fmt.Println("getplant", pluid, err, id)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
 //serves user methods
 func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
-	case r.Method == http.MethodGet:
-		fmt.Println("get stacks")
-		res, err := plant.GetStacksHandler(w, r)
+	case r.Method == http.MethodPost:
+		fmt.Println("add plant")
+		res, err := plant.AddPlantHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte(err.Error()))
 			return
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(res)
-		return
-	case r.Method == http.MethodPost:
-		method := r.Header.Get("Method")
-		var res []byte
-		var err error
-		if method == "add" {
-			fmt.Println("post stack add")
-			res, err = plant.AddStackHandler(w, r)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(err.Error()))
-				return
-			}
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)

@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"test-backend/m/v2/internal/systems/user"
 
 	redis "github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
@@ -33,8 +34,8 @@ type GetGreenhousesV1Result struct {
 
 //GetUserV1 gets user by uuid
 func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1Params) (*GetGreenhousesV1Result, error) {
-
-	userID := l.getUserID(p.UUID)
+	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
+	userID := user.User.GetUserID(p.UUID)
 	greenhouses := []uint64{}
 	v := ctx.Value("greenhouse_id")
 	err := l.dbh.Select(&greenhouses, "SELECT greenhouse_id FROM users_greenhouses WHERE user_id=?;", userID)

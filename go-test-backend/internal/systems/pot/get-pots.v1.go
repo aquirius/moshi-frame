@@ -1,4 +1,4 @@
-package plant
+package pot
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"test-backend/m/v2/internal/systems/stack"
 )
 
 //GetUser
@@ -26,10 +27,12 @@ type GetPotsV1Result struct {
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Result, error) {
+func (l *Pot) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Result, error) {
 	pots := []uint64{}
 	//_ = ctx.Value("pots_id")
-	stackID := l.getStackID(p.SUID)
+	stack := stack.NewStackProvider(ctx, l.dbh, l.rdb, "")
+	stackID := stack.Stack.GetStackID(p.SUID)
+
 	err := l.dbh.Select(&pots, "SELECT puid FROM pots WHERE stack_id=?;", stackID)
 	if err == sql.ErrNoRows {
 		return nil, err
@@ -46,7 +49,7 @@ func (l *Plant) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Re
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) GetPotsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Pot) GetPotsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	ctx := context.Background()
 
 	req := &GetPotsV1Params{}

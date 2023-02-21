@@ -57,36 +57,6 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 	return true
 }
 
-func (l *Plant) getUserID(uuid uint64) int {
-	var query = "SELECT id FROM users WHERE uuid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, uuid)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
-func (l *Plant) getStackID(suid uint64) int {
-	var query = "SELECT id FROM stacks WHERE suid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, suid)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
-func (l *Plant) getGreenhouseID(guid uint64) int {
-	var query = "SELECT id FROM greenhouses WHERE guid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, guid)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
 //GetUserV1 gets user by uuid
 func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV1Result, error) {
 	pluid, err := uuid.NewUUID()

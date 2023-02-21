@@ -32,7 +32,7 @@ type Greenhouses struct {
 	rdb *redis.Client
 }
 
-func (l *Greenhouses) existingPUID(uuid uint32) bool {
+func (l *Greenhouses) ExistingPUID(uuid uint32) bool {
 	var query = "SELECT id FROM pots WHERE puid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
@@ -43,33 +43,10 @@ func (l *Greenhouses) existingPUID(uuid uint32) bool {
 	return true
 }
 
-func (l *Greenhouses) getUserID(uuid uint64) int {
-	var query = "SELECT id FROM users WHERE uuid=?;"
+func (l *Greenhouse) GetGreenhouseID(guid uint64) int {
+	var query = "SELECT id FROM greenhouses WHERE guid=?;"
 	var id int
-	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println("getuser", uuid, err, id)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
-func (l *Greenhouse) getUserID(uuid uint64) int {
-	var query = "SELECT id FROM users WHERE uuid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println("getuser", uuid, err, id)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
-func (l *Greenhouse) getGreenhouseID(uuid uint64) int {
-	var query = "SELECT id FROM greenhouse WHERE guid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println("getuser", uuid, err, id)
+	err := l.dbh.Get(&id, query, guid)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}

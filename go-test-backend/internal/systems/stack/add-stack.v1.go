@@ -1,4 +1,4 @@
-package plant
+package stack
 
 import (
 	"context"
@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"test-backend/m/v2/internal/systems/greenhouse"
 
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -30,10 +31,11 @@ type AddStackV1Result struct {
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) AddStackV1(ctx context.Context, p *AddStackV1Params) (*AddStackV1Result, error) {
+func (l *Stack) AddStackV1(ctx context.Context, p *AddStackV1Params) (*AddStackV1Result, error) {
 
 	suid, err := uuid.NewUUID()
-	greenhouseID := l.getGreenhouseID(p.GUID)
+	greenhouse := greenhouse.NewGreenhouseProvider(ctx, l.dbh, l.rdb, "")
+	greenhouseID := greenhouse.Greenhouse.GetGreenhouseID(p.GUID)
 
 	query := "INSERT INTO stacks (suid, greenhouse_id) VALUES (?,?);"
 	_, err = l.dbh.Exec(query, suid.ID(), greenhouseID)
@@ -49,7 +51,7 @@ func (l *Plant) AddStackV1(ctx context.Context, p *AddStackV1Params) (*AddStackV
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Stack) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()

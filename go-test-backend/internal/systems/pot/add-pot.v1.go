@@ -1,4 +1,4 @@
-package plant
+package pot
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"test-backend/m/v2/internal/systems/stack"
+	"test-backend/m/v2/internal/systems/user"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -29,10 +31,12 @@ type AddPotV1Result struct {
 }
 
 //GetUserV1 gets user by uuid
-func (l *Plant) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Result, error) {
+func (l *Pot) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Result, error) {
 	puid, err := uuid.NewUUID()
-	userID := l.getUserID(p.UUID)
-	stackID := l.getStackID(p.SUID)
+	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
+	userID := user.User.GetUserID(p.UUID)
+	stack := stack.NewStackProvider(ctx, l.dbh, l.rdb, "")
+	stackID := stack.Stack.GetStackID(p.SUID)
 
 	query := "INSERT INTO pots (puid, stack_id, user_id) VALUES (?,?,?);"
 	_, err = l.dbh.Exec(query, puid.ID(), stackID, userID)
@@ -48,7 +52,7 @@ func (l *Plant) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Resul
 }
 
 //GetUserHandler handles get user request
-func (l *Plant) AddPotHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Pot) AddPotHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	ctx := context.Background()
 
