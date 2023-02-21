@@ -176,6 +176,6 @@ func main() {
 	})
 
 	mux.HandleFunc("/users", usersH.ServeHTTP)
-
-	http.ListenAndServe(":1234", mux)
+	//todo .env
+	http.ListenAndServe("127.0.1:1234", mux)
 }
