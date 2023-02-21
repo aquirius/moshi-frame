@@ -36,7 +36,7 @@ func (b *PlantProvider) NewPlant() *Plant {
 
 //serves user methods
 func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {

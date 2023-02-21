@@ -107,7 +107,7 @@ func (b *GreenhousesProvider) NewGreenhouses() *Greenhouses {
 
 //serves user methods
 func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
@@ -128,7 +128,7 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 //serves user methods
 func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("content-type", "application/json")
+	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
