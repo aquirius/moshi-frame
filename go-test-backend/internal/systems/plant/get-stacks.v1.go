@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -32,11 +31,10 @@ type GetStacksV1Result struct {
 //GetUserV1 gets user by uuid
 func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStacksV1Result, error) {
 	stacks := []uint64{}
-	v := ctx.Value("stacks_id")
+	//_ = ctx.Value("stacks_id")
 	greenhouseID := l.getGreenhouseID(p.GUID)
 	err := l.dbh.Select(&stacks, "SELECT suid FROM stacks WHERE greenhouse_id=?;", greenhouseID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows for get stacks")
 		return nil, err
 	}
 
@@ -47,8 +45,6 @@ func (l *Plant) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStac
 		}
 		getStacks = append(getStacks, res)
 	}
-
-	fmt.Println("get stacks ", v, stacks)
 
 	return &GetStacksV1Result{Stacks: getStacks}, nil
 }

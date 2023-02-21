@@ -33,8 +33,7 @@ type RedisSession struct {
 //GetUserV1 gets user by uuid
 func (l *User) GetUserSettingsV1(ctx context.Context, p *GetUserSettingsV1Params) (*GetUserSettingsV1Result, error) {
 	user := GetUser{}
-	v := ctx.Value("session-id")
-	fmt.Println(v)
+	//v := ctx.Value("session-id")
 	err := l.dbh.Get(&user, "SELECT uuid, registered_ts, display_name, first_name, last_name, email, birthday FROM users WHERE uuid=?", p.UUID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")
@@ -58,15 +57,19 @@ func (l *User) GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) ([
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
 		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
-			fmt.Println("token does not exist")
+			return nil, errors.New("not logged in")
 		} else if err != nil {
-			panic(err)
+			return nil, err
 		}
 	} else {
 		return nil, errors.New("not logged in")
 	}
 
-	json.Unmarshal([]byte(redisSession), &redisJson)
+	err = json.Unmarshal([]byte(redisSession), &redisJson)
+	if err != nil {
+		redisJson.Authenticated = false
+		return nil, errors.New("you motherfucker")
+	}
 
 	if !redisJson.Authenticated {
 		return nil, errors.New("not authenticated")

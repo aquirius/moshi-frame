@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -61,7 +60,6 @@ func (l *Users) EditUserV1(p *EditUserV1Params) error {
 
 	_, err := l.dbh.Exec(query, arguments...)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	return nil

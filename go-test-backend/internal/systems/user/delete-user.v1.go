@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -25,7 +24,6 @@ type DeleteUsersV1Result struct {
 func (l *Users) DeleteUserV1(p *DeleteUserV1Params) error {
 	_, err := l.dbh.Exec("DELETE FROM users WHERE uuid=?;", p.ID)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	return nil

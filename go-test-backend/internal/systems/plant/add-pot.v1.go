@@ -3,7 +3,6 @@ package plant
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -34,8 +33,6 @@ func (l *Plant) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Resul
 	puid, err := uuid.NewUUID()
 	userID := l.getUserID(p.UUID)
 	stackID := l.getStackID(p.SUID)
-
-	fmt.Println("add pot params : ", p)
 
 	query := "INSERT INTO pots (puid, stack_id, user_id) VALUES (?,?,?);"
 	_, err = l.dbh.Exec(query, puid.ID(), stackID, userID)

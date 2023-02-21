@@ -41,7 +41,6 @@ func (l *Plant) existingPLUID(uuid uint32) bool {
 	var query = "SELECT id FROM plants WHERE pluid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println(err)
 	if err != nil && err == sql.ErrNoRows {
 		return false
 	}
@@ -52,7 +51,6 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 	var query = "SELECT id FROM pots WHERE puid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println(err)
 	if err != nil && err == sql.ErrNoRows {
 		return false
 	}
@@ -63,7 +61,6 @@ func (l *Plant) getUserID(uuid uint64) int {
 	var query = "SELECT id FROM users WHERE uuid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println("plant getuser", uuid, err, id)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}
@@ -74,7 +71,6 @@ func (l *Plant) getStackID(suid uint64) int {
 	var query = "SELECT id FROM stacks WHERE suid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, suid)
-	fmt.Println("plant getstack", suid, err, id)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}
@@ -85,7 +81,6 @@ func (l *Plant) getGreenhouseID(guid uint64) int {
 	var query = "SELECT id FROM greenhouses WHERE guid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, guid)
-	fmt.Println("getgreenhouse", guid, err, id)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}
@@ -99,8 +94,7 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 
 	//userID := ctx.Value("user_id")
 
-	userID := l.getUserID(p.UUID)
-	fmt.Println("userid", userID)
+	//userID := l.getUserID(p.UUID)
 
 	query := "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
 	result, err := l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -137,21 +131,18 @@ func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
-	var redisSession string
 	var err error
 	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
-		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		//todo
+		_, err = l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
 			fmt.Println("token does not exist")
 		} else if err != nil {
 			panic(err)
 		}
 	}
-
-	fmt.Println("redisSession", redisSession)
-	fmt.Println("addplant", vars["uuid"])
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 
 	req := &AddPlantV1Params{
