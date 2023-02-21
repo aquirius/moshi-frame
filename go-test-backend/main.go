@@ -2,11 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
-	"test-backend/m/v2/internal/systems/greenhouse"
-	"test-backend/m/v2/internal/systems/plant"
-	"test-backend/m/v2/internal/systems/user"
+	greenhouse "test-backend/m/v2/internal/systems/greenhouse"
+	plant "test-backend/m/v2/internal/systems/plant"
+	pot "test-backend/m/v2/internal/systems/pot"
+	stack "test-backend/m/v2/internal/systems/stack"
+	user "test-backend/m/v2/internal/systems/user"
 
 	"test-backend/m/v2/server"
 
@@ -18,11 +19,14 @@ import (
 
 //Runtime points to our systems
 type Runtime struct {
-	db          *sqlx.DB
-	rdb         *redis.Client
-	user        *user.User
-	users       *user.Users
-	plant       *plant.Plant
+	db    *sqlx.DB
+	rdb   *redis.Client
+	user  *user.User
+	users *user.Users
+	plant *plant.Plant
+	pot   *pot.Pot
+	stack *stack.Stack
+
 	greenhouse  *greenhouse.Greenhouse
 	greenhouses *greenhouse.Greenhouses
 }
@@ -43,6 +47,12 @@ func BuildRuntime() Runtime {
 	//init plant
 	plantProvider := plant.NewPlantProvider(context, &server.Sql, &server.Redis, "sql")
 	plant := plantProvider.NewPlant()
+	//init plant
+	potProvider := pot.NewPotProvider(context, &server.Sql, &server.Redis, "sql")
+	pot := potProvider.NewPot()
+	//init plant
+	stackProvider := stack.NewStackProvider(context, &server.Sql, &server.Redis, "sql")
+	stack := stackProvider.NewStack()
 	//init greenhouses
 	greenhousesProvider := greenhouse.NewGreenhousesProvider(context, &server.Sql, &server.Redis, "sql")
 	greenhouses := greenhousesProvider.NewGreenhouses()
@@ -56,6 +66,8 @@ func BuildRuntime() Runtime {
 		user:        user,
 		users:       users,
 		plant:       plant,
+		pot:         pot,
+		stack:       stack,
 		greenhouse:  greenhouse,
 		greenhouses: greenhouses,
 	}
@@ -69,6 +81,9 @@ func main() {
 	//setup routes with their handlers
 	userH := rt.user
 	usersH := rt.users
+	plantH := rt.plant
+	potH := rt.pot
+	stackH := rt.stack
 	greenhouseH := rt.greenhouse
 	greenhousesH := rt.greenhouses
 
@@ -78,103 +93,9 @@ func main() {
 	mux.HandleFunc("/user/{uuid}", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse", greenhousesH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}", greenhouseH.ServeHTTP)
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/get-stacks", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
-		switch {
-		case r.Method == http.MethodGet:
-			fmt.Println("get stacks")
-			res, err := rt.plant.GetStacksHandler(w, r)
-			if err != nil {
-				w.WriteHeader(http.StatusNotFound)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-			w.Write(res)
-			return
-		default:
-			return
-		}
-	})
-
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/get-pots", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
-		switch {
-		case r.Method == http.MethodPost:
-			method := r.Header.Get("Method")
-			var res []byte
-			var err error
-			if method == "add" {
-				fmt.Println("post get pots")
-				res, err = rt.plant.GetPotsHandler(w, r)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					w.Write([]byte(err.Error()))
-					return
-				}
-			}
-			w.WriteHeader(http.StatusOK)
-			w.Write(res)
-			return
-		default:
-			return
-		}
-	})
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/add-stack", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
-		switch {
-		case r.Method == http.MethodPost:
-			method := r.Header.Get("Method")
-			var res []byte
-			var err error
-			if method == "add" {
-				fmt.Println("post stack add")
-				res, err = rt.plant.AddStackHandler(w, r)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					w.Write([]byte(err.Error()))
-					return
-				}
-			}
-			w.WriteHeader(http.StatusOK)
-			w.Write(res)
-			return
-		default:
-			return
-		}
-	})
-
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/add-pot", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
-		switch {
-		case r.Method == http.MethodPost:
-			method := r.Header.Get("Method")
-			var res []byte
-			var err error
-			if method == "add" {
-				fmt.Println("post stack add")
-				res, err = rt.plant.AddPotHandler(w, r)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					w.Write([]byte(err.Error()))
-					return
-				}
-			}
-			w.WriteHeader(http.StatusOK)
-			w.Write(res)
-			return
-		default:
-			return
-		}
-	})
-
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/plant", plantH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/pot", potH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack", stackH.ServeHTTP)
 	mux.HandleFunc("/users", usersH.ServeHTTP)
 	//todo .env
 	http.ListenAndServe("127.0.1:1234", mux)
