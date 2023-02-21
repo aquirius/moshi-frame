@@ -79,7 +79,7 @@ func main() {
 	mux.HandleFunc("/user/{uuid}/greenhouse", greenhousesH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}", greenhouseH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/get-stacks", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 		switch {
@@ -99,7 +99,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/get-pots", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 		switch {
@@ -124,7 +124,7 @@ func main() {
 		}
 	})
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/add-stack", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 		switch {
@@ -150,7 +150,7 @@ func main() {
 	})
 
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/add-pot", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("content-type", "application/json")
+		w.Header().Set("Content-type", "application/json")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 		switch {
