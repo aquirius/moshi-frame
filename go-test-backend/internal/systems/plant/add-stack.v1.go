@@ -16,7 +16,7 @@ import (
 
 //GetUser
 type AddStack struct {
-	SUID uint64 `json:"guid"`
+	SUID uint64 `db:"suid"`
 }
 
 //GetUserV1Params
