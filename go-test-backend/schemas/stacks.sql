@@ -2,6 +2,9 @@
 CREATE TABLE `stacks` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `suid` varchar(36) NOT NULL,
+  `direction` enum('vertical','horizontal') NOT NULL DEFAULT 'horizontal',
+  `rows` int unsigned NULL,
+  `columns` int unsigned NULL,
   `greenhouse_id` int unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `stacks_suid_IDX` (`suid`) USING BTREE,
