@@ -103,7 +103,7 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//serves user methods
+//serves Greenhouses methods
 func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")

@@ -15,9 +15,12 @@ import (
 
 //GetUser
 type GetGreenhouse struct {
-	GUID    uint64 `db:"guid"`
-	Address string `db:"address"`
-	Zip     uint64 `db:"zip"`
+	GUID        uint64 `db:"guid"`
+	DisplayName string `db:"display_name"`
+	Address     string `db:"address"`
+	Zip         uint64 `db:"zip"`
+	Status      string `db:"status"`
+	Type        string `db:"type"`
 }
 
 //GetUserV1Params
@@ -35,7 +38,7 @@ type GetGreenhouseV1Result struct {
 func (l *Greenhouse) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Params) (*GetGreenhouseV1Result, error) {
 	greenhouse := GetGreenhouse{}
 	v := ctx.Value("greenhouse_id")
-	err := l.dbh.Get(&greenhouse, "SELECT guid, address, zip FROM greenhouses WHERE guid=?;", p.GUID)
+	err := l.dbh.Get(&greenhouse, "SELECT guid, display_name, address, zip, status, type FROM greenhouses WHERE guid=?;", p.GUID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")
 		return nil, err
@@ -65,6 +68,7 @@ func (l *Greenhouse) GetGreenhouseHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(res)
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
 		log.Fatal("error in json")

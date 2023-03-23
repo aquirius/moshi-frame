@@ -91,7 +91,7 @@ func main() {
 	mux.HandleFunc("/logout", userH.ServeHTTP)
 	mux.HandleFunc("/register", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}", userH.ServeHTTP)
-	mux.HandleFunc("/user/{uuid}/greenhouse", greenhousesH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouses", greenhousesH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}", greenhouseH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/plant", plantH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/pot", potH.ServeHTTP)

@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -21,18 +22,22 @@ type EditUser struct {
 
 //EditUserV1Params
 type EditUserV1Params struct {
-	ID          string  `json:"UUID"`
-	Email       *string `json:"Email"`
-	DisplayName *string `json:"DisplayName"`
-	FirstName   *string `json:"FirstName"`
-	LastName    *string `json:"LastName"`
-	Password    *string `json:"Password"`
+	ID          string  `json:"uuid"`
+	Email       *string `json:"email"`
+	DisplayName *string `json:"display_name"`
+	FirstName   *string `json:"first_name"`
+	LastName    *string `json:"last_name"`
+	Password    *string `json:"password"`
 }
 
 //EditUserV1 edits a user with given arguments
 func (l *Users) EditUserV1(p *EditUserV1Params) error {
 	var query string
 	var arguments = []any{}
+	fmt.Println(*p.DisplayName, *p.FirstName, *p.LastName, *p.Email)
+	if *p.DisplayName == "" && *p.FirstName == "" && *p.LastName == "" && *p.Email == "" {
+		return nil
+	}
 	query += "UPDATE users SET "
 	if *p.DisplayName != "" {
 		arguments = append(arguments, *p.DisplayName)
@@ -68,14 +73,19 @@ func (l *Users) EditUserV1(p *EditUserV1Params) error {
 //EditUserHandler handles editing one user
 func (l *Users) EditUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &EditUserV1Params{}
-
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
+
 	err := l.EditUserV1(req)
+	fmt.Println(err)
+
 	if err != nil {
 		return nil, err
 	}
+
 	jsonBytes, err := json.Marshal("success")
+	fmt.Println(err)
+
 	if err != nil {
 		return nil, err
 	}
