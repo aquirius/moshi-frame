@@ -6,21 +6,21 @@ import (
 	"net/http"
 )
 
-//DeleteUser
+// DeleteUser
 type DeleteUser struct {
 	ID string `json:"uuid"`
 }
 
-//DeleteUserV1Params
+// DeleteUserV1Params
 type DeleteUserV1Params struct {
 	ID string `json:"uuid"`
 }
 
-//DeleteUsersV1Result
+// DeleteUsersV1Result
 type DeleteUsersV1Result struct {
 }
 
-//DeleteUserV1 deletes a user with given uuid
+// DeleteUserV1 deletes a user with given uuid
 func (l *Users) DeleteUserV1(p *DeleteUserV1Params) error {
 	_, err := l.dbh.Exec("DELETE FROM users WHERE uuid=?;", p.ID)
 	if err != nil {
@@ -29,7 +29,7 @@ func (l *Users) DeleteUserV1(p *DeleteUserV1Params) error {
 	return nil
 }
 
-//DeleteUserHandler handles the deletion of a user
+// DeleteUserHandler handles the deletion of a user
 func (l *Users) DeleteUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &DeleteUserV1Params{}
 

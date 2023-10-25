@@ -14,10 +14,10 @@ import (
 
 // RegisterUser
 type RegisterUser struct {
-	UUID uint64 `json:uuid`
+	UUID uint64 `json:'uuid'`
 }
 
-//RegisterUserV1Params
+// RegisterUserV1Params
 type RegisterUserV1Params struct {
 	ID          uint32 `json:"uuid"`
 	DisplayName string `json:"display_name"`
@@ -28,7 +28,7 @@ type RegisterUserV1Params struct {
 	Password    string `json:"password"`
 }
 
-//RegisterUserV1Result
+// RegisterUserV1Result
 type RegisterUserV1Result struct {
 	User *RegisterUser `json:"user"`
 }
@@ -53,7 +53,7 @@ func (l *User) existingUsername(name string) bool {
 	return true
 }
 
-//RegisterUserV1 creates a register user object with given arguments
+// RegisterUserV1 creates a register user object with given arguments
 func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params) (*RegisterUserV1Result, error) {
 	uuid, err := uuid.NewUUID()
 	if err != nil {
@@ -81,7 +81,7 @@ func (l *User) RegisterUserV1(ctx context.Context, p *RegisterUserV1Params) (*Re
 	return &RegisterUserV1Result{User: res}, nil
 }
 
-//RegisterUserHandler handles register user request
+// RegisterUserHandler handles register user request
 func (l *User) RegisterUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	res := &RegisterUserV1Result{}
 	req := &RegisterUserV1Params{}
