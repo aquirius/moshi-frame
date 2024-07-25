@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,22 +15,22 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type AddStack struct {
 	SUID uint64 `db:"suid"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type AddStackV1Params struct {
 	GUID uint64 `json:"guid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type AddStackV1Result struct {
 	Stack AddStack `json:"stack"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Stack) AddStackV1(ctx context.Context, p *AddStackV1Params) (*AddStackV1Result, error) {
 
 	suid, err := uuid.NewUUID()
@@ -50,7 +50,7 @@ func (l *Stack) AddStackV1(ctx context.Context, p *AddStackV1Params) (*AddStackV
 	return &AddStackV1Result{Stack: *res}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Stack) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -74,7 +74,7 @@ func (l *Stack) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	req := &AddStackV1Params{
 		GUID: guid,
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.AddStackV1(ctx, req)
 	if err != nil {

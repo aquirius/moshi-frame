@@ -2,11 +2,11 @@ package greenhouse
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
-//EditGreenhouse
+// EditGreenhouse
 type EditGreenhouse struct {
 	DisplayName string `json:"display_name"`
 	Status      string `json:"status"`
@@ -14,7 +14,7 @@ type EditGreenhouse struct {
 	Address     string `json:"address"`
 }
 
-//EditGreenhouseV1Params
+// EditGreenhouseV1Params
 type EditGreenhouseV1Params struct {
 	ID   string `json:"UUID"`
 	GUID string `json:"GUID"`
@@ -25,7 +25,7 @@ type EditGreenhouseV1Params struct {
 	Address     *string `json:"Address"`
 }
 
-//EditGreenhouseV1 edits a Greenhouse with given arguments
+// EditGreenhouseV1 edits a Greenhouse with given arguments
 func (l *Greenhouse) EditGreenhouseV1(p *EditGreenhouseV1Params) error {
 	var query string
 	var arguments = []any{}
@@ -61,11 +61,11 @@ func (l *Greenhouse) EditGreenhouseV1(p *EditGreenhouseV1Params) error {
 	return nil
 }
 
-//EditGreenhouseHandler handles editing one Greenhouse
+// EditGreenhouseHandler handles editing one Greenhouse
 func (l *Greenhouse) EditGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &EditGreenhouseV1Params{}
 
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	err := l.EditGreenhouseV1(req)
 	if err != nil {

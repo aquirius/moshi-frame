@@ -2,12 +2,12 @@ package user
 
 import (
 	"context"
+	"io"
 	"time"
 
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	redis "github.com/go-redis/redis/v8"
@@ -29,7 +29,7 @@ type LoginUserV1Result struct {
 	SessionID string `json:"session_id"`
 }
 
-//LoginUserV1 verifys user login
+// LoginUserV1 verifys user login
 func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUserV1Result, error) {
 	//res := &LoginUserV1Result{}
 	var sessionID string
@@ -84,13 +84,13 @@ func (l *User) LoginUserV1(ctx context.Context, p *LoginUserV1Params) (*LoginUse
 	return &LoginUserV1Result{UUID: session.UUID, SessionID: sessionID}, nil
 }
 
-//LoginUserHandler handles login user request
+// LoginUserHandler handles login user request
 func (l *User) LoginUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &LoginUserV1Params{}
 
 	cookie, _ := r.Cookie("session-id")
 
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 
 	ctx := context.Background()

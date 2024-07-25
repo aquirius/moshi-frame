@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -13,23 +13,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type GetStacks struct {
 	SUID uint64 `db:"suid"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type GetStacksV1Params struct {
 	UUID uint64 `json:"uuid"`
 	GUID uint64 `json:"guid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type GetStacksV1Result struct {
 	Stacks []GetStacks `json:"stacks"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Stack) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStacksV1Result, error) {
 	stacks := []uint64{}
 	//_ = ctx.Value("stacks_id")
@@ -52,7 +52,7 @@ func (l *Stack) GetStacksV1(ctx context.Context, p *GetStacksV1Params) (*GetStac
 	return &GetStacksV1Result{Stacks: getStacks}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Stack) GetStacksHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	ctx := context.Background()
@@ -64,7 +64,7 @@ func (l *Stack) GetStacksHandler(w http.ResponseWriter, r *http.Request) ([]byte
 		UUID: uuid,
 		GUID: guid,
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetStacksV1(ctx, req)
 	if err != nil {

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -48,41 +48,53 @@ func run(name string, cmds []string, stdin []byte) error {
 func main() {
 	out := []string{}
 
-	greenhouse, err := ioutil.ReadFile("./schemas/greenhouses.sql")
+	greenhouse, err := os.ReadFile("./schemas/greenhouses.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	userGreenhouse, err := ioutil.ReadFile("./schemas/users-greenhouses.sql")
+	userGreenhouse, err := os.ReadFile("./schemas/users-greenhouses.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	nutrients, err := ioutil.ReadFile("./schemas/nutrients.sql")
+	nutrients, err := os.ReadFile("./schemas/nutrients.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	plans, err := ioutil.ReadFile("./schemas/plans.sql")
+	plans, err := os.ReadFile("./schemas/plans.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	plants, err := ioutil.ReadFile("./schemas/plants.sql")
+	plants, err := os.ReadFile("./schemas/plants.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	pots, err := ioutil.ReadFile("./schemas/pots.sql")
+	pots, err := os.ReadFile("./schemas/pots.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	stacks, err := ioutil.ReadFile("./schemas/stacks.sql")
+	stacks, err := os.ReadFile("./schemas/stacks.sql")
 	if err != nil {
 		panic(err.Error())
 	}
-	users, err := ioutil.ReadFile("./schemas/users.sql")
+	users, err := os.ReadFile("./schemas/users.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	sprouts, err := os.ReadFile("./schemas/sprouts.sql")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	out = append(out, string(greenhouse), string(nutrients), string(plans), string(plants), string(pots), string(stacks), string(users), string(userGreenhouse))
-
+	out = append(out,
+		string(greenhouse),
+		string(nutrients),
+		string(plans),
+		string(plants),
+		string(pots),
+		string(stacks),
+		string(users),
+		string(userGreenhouse),
+		string(sprouts))
 	s := ""
 	for _, v := range out {
 		s += v

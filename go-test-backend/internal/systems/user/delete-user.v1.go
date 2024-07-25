@@ -2,7 +2,7 @@ package user
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -33,7 +33,7 @@ func (l *Users) DeleteUserV1(p *DeleteUserV1Params) error {
 func (l *Users) DeleteUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &DeleteUserV1Params{}
 
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	err := l.DeleteUserV1(req)
 	if err != nil {

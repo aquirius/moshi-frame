@@ -5,28 +5,28 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"test-backend/m/v2/internal/systems/stack"
 )
 
-//GetUser
+// GetUser
 type GetPots struct {
 	PUID uint64 `db:"puid"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type GetPotsV1Params struct {
 	SUID uint64 `json:"suid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type GetPotsV1Result struct {
 	Pots []GetPots `json:"pots"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Pot) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Result, error) {
 	pots := []uint64{}
 	//_ = ctx.Value("pots_id")
@@ -48,12 +48,12 @@ func (l *Pot) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Resu
 	return &GetPotsV1Result{Pots: getPots}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Pot) GetPotsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	ctx := context.Background()
 
 	req := &GetPotsV1Params{}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	fmt.Println(req)
 	res, err := l.GetPotsV1(ctx, req)

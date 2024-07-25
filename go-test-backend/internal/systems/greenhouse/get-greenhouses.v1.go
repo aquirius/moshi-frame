@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,24 +15,24 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type GetGreenhouses struct {
 	GUID    uint64 `db:"guid"`
 	Address string `db:"address"`
 	Zip     uint64 `db:"zip"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type GetGreenhousesV1Params struct {
 	UUID uint64 `json:"uuid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type GetGreenhousesV1Result struct {
 	Greenhouses []GetGreenhouses `json:"greenhouses"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1Params) (*GetGreenhousesV1Result, error) {
 	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
 	userID := user.User.GetUserID(p.UUID)
@@ -60,7 +60,7 @@ func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1P
 	return &GetGreenhousesV1Result{Greenhouses: getGreenhouses}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Greenhouses) GetGreenhousesHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -84,7 +84,7 @@ func (l *Greenhouses) GetGreenhousesHandler(w http.ResponseWriter, r *http.Reque
 	req := &GetGreenhousesV1Params{
 		UUID: uuid,
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetGreenhousesV1(ctx, req)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
@@ -87,7 +87,7 @@ func (l *User) RegisterUserHandler(w http.ResponseWriter, r *http.Request) ([]by
 	req := &RegisterUserV1Params{}
 
 	//read body and map on params
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 
 	ctx := context.Background()

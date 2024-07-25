@@ -3,7 +3,7 @@ package pot
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,23 +14,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type AddPot struct {
 	PUID uint64 `json:"puid"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type AddPotV1Params struct {
 	UUID uint64 `json:"uuid"`
 	SUID uint64 `json:"suid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type AddPotV1Result struct {
 	Pot AddPot `json:"pot"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Pot) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Result, error) {
 	puid, err := uuid.NewUUID()
 	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
@@ -51,7 +51,7 @@ func (l *Pot) AddPotV1(ctx context.Context, p *AddPotV1Params) (*AddPotV1Result,
 	return &AddPotV1Result{Pot: *res}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Pot) AddPotHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	ctx := context.Background()
@@ -60,7 +60,7 @@ func (l *Pot) AddPotHandler(w http.ResponseWriter, r *http.Request) ([]byte, err
 	req := &AddPotV1Params{
 		UUID: uuid,
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.AddPotV1(ctx, req)
 	if err != nil {

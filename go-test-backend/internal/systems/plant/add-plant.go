@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,7 +16,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type AddPlant struct {
 	UUID        string `db:"uuid"`
 	TS          string `db:"registered_ts"`
@@ -27,12 +27,12 @@ type AddPlant struct {
 	Birthday    string `db:"birthday"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type AddPlantV1Params struct {
 	UUID uint64 `json:"uuid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type AddPlantV1Result struct {
 	UUID uint64 `json:"uuid"`
 }
@@ -57,7 +57,7 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 	return true
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV1Result, error) {
 	pluid, err := uuid.NewUUID()
 	puid, err := uuid.NewUUID()
@@ -95,7 +95,7 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	return &AddPlantV1Result{UUID: uint64(pluid.ID())}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -120,7 +120,7 @@ func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	}
 	fmt.Println(req)
 
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.AddPlantV1(ctx, req)
 	if err != nil {

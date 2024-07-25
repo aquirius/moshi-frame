@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -14,12 +14,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUserV1Params
+// GetUserV1Params
 type GetUserSettingsV1Params struct {
 	UUID string `json:"uuid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type GetUserSettingsV1Result struct {
 	User GetUser `json:"user"`
 }
@@ -30,7 +30,7 @@ type RedisSession struct {
 	Authenticated bool   `json:"Authenticated"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *User) GetUserSettingsV1(ctx context.Context, p *GetUserSettingsV1Params) (*GetUserSettingsV1Result, error) {
 	user := GetUser{}
 	//v := ctx.Value("session-id")
@@ -43,7 +43,7 @@ func (l *User) GetUserSettingsV1(ctx context.Context, p *GetUserSettingsV1Params
 	return &GetUserSettingsV1Result{User: user}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *User) GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -78,7 +78,7 @@ func (l *User) GetUserSettingsHandler(w http.ResponseWriter, r *http.Request) ([
 	req := &GetUserSettingsV1Params{
 		UUID: vars["uuid"],
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetUserSettingsV1(ctx, req)
 	if err != nil {

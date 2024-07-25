@@ -3,11 +3,11 @@ package user
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
-//EditUser
+// EditUser
 type EditUser struct {
 	Email           string `json:"email"`
 	DisplayName     string `json:"display_name"`
@@ -20,7 +20,7 @@ type EditUser struct {
 	Password        string `json:"password"`
 }
 
-//EditUserV1Params
+// EditUserV1Params
 type EditUserV1Params struct {
 	ID          string  `json:"uuid"`
 	Email       *string `json:"email"`
@@ -30,7 +30,7 @@ type EditUserV1Params struct {
 	Password    *string `json:"password"`
 }
 
-//EditUserV1 edits a user with given arguments
+// EditUserV1 edits a user with given arguments
 func (l *Users) EditUserV1(p *EditUserV1Params) error {
 	var query string
 	var arguments = []any{}
@@ -70,10 +70,10 @@ func (l *Users) EditUserV1(p *EditUserV1Params) error {
 	return nil
 }
 
-//EditUserHandler handles editing one user
+// EditUserHandler handles editing one user
 func (l *Users) EditUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &EditUserV1Params{}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 
 	err := l.EditUserV1(req)

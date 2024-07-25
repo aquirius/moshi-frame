@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -15,24 +15,24 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser
+// GetUser
 type AddGreenhouse struct {
 	GUID uint64 `json:"guid"`
 }
 
-//GetUserV1Params
+// GetUserV1Params
 type AddGreenhouseV1Params struct {
 	UUID   uint64 `json:"uuid"`
 	Adress string `json:"adress"`
 	Zip    int16  `json:"zip"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type AddGreenhouseV1Result struct {
 	Greenhouse AddGreenhouse `json:"greenhouse"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Params) (*AddGreenhouseV1Result, error) {
 
 	guid, err := uuid.NewUUID()
@@ -62,7 +62,7 @@ func (l *Greenhouses) AddGreenhouseV1(ctx context.Context, p *AddGreenhouseV1Par
 	return &AddGreenhouseV1Result{Greenhouse: res}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -89,7 +89,7 @@ func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Reques
 		Adress: "Hinterdupfing",
 		Zip:    int16(zip),
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	fmt.Println("add greenhouse req", req)
 

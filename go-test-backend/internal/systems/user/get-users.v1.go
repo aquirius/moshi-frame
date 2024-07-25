@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	redis "github.com/go-redis/redis/v8"
 )
 
-//GetUser
+// GetUser
 type GetUser struct {
 	UUID        string `db:"uuid"`
 	TS          string `db:"registered_ts"`
@@ -23,16 +23,16 @@ type GetUser struct {
 	Birthday    string `db:"birthday"`
 }
 
-//GetUsersV1Params
+// GetUsersV1Params
 type GetUsersV1Params struct {
 }
 
-//GetUsersV1Result
+// GetUsersV1Result
 type GetUsersV1Result struct {
 	Users []GetUser `json:"users"`
 }
 
-//GetUsersV1 gets all users
+// GetUsersV1 gets all users
 func (l *Users) GetUsersV1(p *GetUsersV1Params) (*GetUsersV1Result, error) {
 	users := []GetUser{}
 
@@ -45,7 +45,7 @@ func (l *Users) GetUsersV1(p *GetUsersV1Params) (*GetUsersV1Result, error) {
 	return &GetUsersV1Result{Users: users}, nil
 }
 
-//GetUsersHandler get all users request
+// GetUsersHandler get all users request
 func (l *Users) GetUsersHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &GetUsersV1Params{}
 
@@ -73,13 +73,12 @@ func (l *Users) GetUsersHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 		return nil, errors.New("not logged in")
 	}
 
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetUsersV1(nil)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(res)
 	jsonBytes, err := json.Marshal(&res)
 	if err != nil {
 		return nil, err

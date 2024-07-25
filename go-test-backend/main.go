@@ -6,6 +6,7 @@ import (
 	greenhouse "test-backend/m/v2/internal/systems/greenhouse"
 	plant "test-backend/m/v2/internal/systems/plant"
 	pot "test-backend/m/v2/internal/systems/pot"
+	sprout "test-backend/m/v2/internal/systems/sprout"
 	stack "test-backend/m/v2/internal/systems/stack"
 	user "test-backend/m/v2/internal/systems/user"
 
@@ -17,7 +18,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-//Runtime points to our systems
+// Runtime points to our systems
 type Runtime struct {
 	db    *sqlx.DB
 	rdb   *redis.Client
@@ -29,9 +30,11 @@ type Runtime struct {
 
 	greenhouse  *greenhouse.Greenhouse
 	greenhouses *greenhouse.Greenhouses
+
+	sprout *sprout.Sprout
 }
 
-//BuildRuntime initializes our systems
+// BuildRuntime initializes our systems
 func BuildRuntime() Runtime {
 	//init empty context
 	context := context.Background()
@@ -59,6 +62,9 @@ func BuildRuntime() Runtime {
 	//init greenhouse
 	greenhouseProvider := greenhouse.NewGreenhouseProvider(context, &server.Sql, &server.Redis, "sql")
 	greenhouse := greenhouseProvider.NewGreenhouse()
+	//init sprout
+	sproutProvider := sprout.NewSproutProvider(context, &server.Sql, &server.Redis, "sql")
+	sprout := sproutProvider.NewSprout()
 
 	return Runtime{
 		db:          &server.Sql,
@@ -70,6 +76,7 @@ func BuildRuntime() Runtime {
 		stack:       stack,
 		greenhouse:  greenhouse,
 		greenhouses: greenhouses,
+		sprout:      sprout,
 	}
 }
 
@@ -86,6 +93,7 @@ func main() {
 	stackH := rt.stack
 	greenhouseH := rt.greenhouse
 	greenhousesH := rt.greenhouses
+	sproutH := rt.sprout
 
 	mux.HandleFunc("/login", userH.ServeHTTP)
 	mux.HandleFunc("/logout", userH.ServeHTTP)
@@ -96,6 +104,7 @@ func main() {
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/plant", plantH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/pot", potH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack", stackH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}", sproutH.ServeHTTP)
 	mux.HandleFunc("/users", usersH.ServeHTTP)
 	//todo .env
 	http.ListenAndServe("127.0.1:1234", mux)

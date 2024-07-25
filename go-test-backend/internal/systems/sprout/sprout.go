@@ -1,4 +1,4 @@
-package pot
+package sprout
 
 import (
 	"context"
@@ -9,46 +9,54 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// PotProvider provides *Pot
-type PotProvider struct {
-	Pot *Pot
+// SproutProvider provides *Sprout
+type SproutProvider struct {
+	Sprout *Sprout
 }
 
-// Pot is capable of providing core access
-type Pot struct {
+// Sprout is capable of providing core access
+type Sprout struct {
 	dbh *sqlx.DB
 	rdb *redis.Client
 }
 
 // NewCoreProvider returns a new Core provider
-func NewPotProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *PotProvider {
-	return &PotProvider{
-		&Pot{
+func NewSproutProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *SproutProvider {
+	return &SproutProvider{
+		&Sprout{
 			dbh: dbh,
 			rdb: rdb,
 		},
 	}
 }
 
-func (b *PotProvider) NewPot() *Pot {
-	return b.Pot
+func (b *SproutProvider) NewSprout() *Sprout {
+	return b.Sprout
 }
 
 // serves user methods
-func (pot *Pot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (sprout *Sprout) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		return
+		fmt.Println("post sprout get")
+		res, err := sprout.GetSproutHandler(w, r)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
 	case r.Method == http.MethodPost:
 		method := r.Header.Get("Method")
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post pot add")
-			res, err = pot.AddPotHandler(w, r)
+			fmt.Println("post sprout add")
+			res, err = sprout.AddSproutHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))
@@ -56,8 +64,8 @@ func (pot *Pot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if method == "get" {
-			fmt.Println("post pot get")
-			res, err = pot.GetPotsHandler(w, r)
+			fmt.Println("post sprout get")
+			res, err = sprout.GetSproutHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))

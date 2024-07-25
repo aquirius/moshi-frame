@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -14,17 +14,17 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUserV1Params
+// GetUserV1Params
 type GetUserV1Params struct {
 	UUID string `json:"uuid"`
 }
 
-//GetUserV1Result
+// GetUserV1Result
 type GetUserV1Result struct {
 	User GetUser `json:"user"`
 }
 
-//GetUserV1 gets user by uuid
+// GetUserV1 gets user by uuid
 func (l *User) GetUserV1(ctx context.Context, p *GetUserV1Params) (*GetUserV1Result, error) {
 	user := GetUser{}
 	v := ctx.Value("session-id")
@@ -39,7 +39,7 @@ func (l *User) GetUserV1(ctx context.Context, p *GetUserV1Params) (*GetUserV1Res
 	return &GetUserV1Result{User: user}, nil
 }
 
-//GetUserHandler handles get user request
+// GetUserHandler handles get user request
 func (l *User) GetUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
@@ -65,7 +65,7 @@ func (l *User) GetUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, e
 	req := &GetUserV1Params{
 		UUID: vars["uuid"],
 	}
-	reqBody, _ := ioutil.ReadAll(r.Body)
+	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.GetUserV1(ctx, req)
 	if err != nil {
