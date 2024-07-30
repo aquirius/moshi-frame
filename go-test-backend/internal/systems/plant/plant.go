@@ -36,17 +36,16 @@ func (b *PlantProvider) NewPlant() *Plant {
 }
 
 func (l *Plant) GetPlantID(pluid uint64) int {
-	var query = "SELECT id FROM greenhouse WHERE guid=?;"
+	var query = "SELECT id FROM plants WHERE pluid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, pluid)
-	fmt.Println("getplant", pluid, err, id)
 	if err != nil && err == sql.ErrNoRows {
 		return 0
 	}
 	return id
 }
 
-//serves user methods
+// serves user methods
 func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")

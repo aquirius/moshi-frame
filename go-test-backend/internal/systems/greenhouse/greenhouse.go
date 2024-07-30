@@ -36,7 +36,6 @@ func (l *Greenhouses) ExistingPUID(uuid uint32) bool {
 	var query = "SELECT id FROM pots WHERE puid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, uuid)
-	fmt.Println(err)
 	if err != nil && err == sql.ErrNoRows {
 		return false
 	}
@@ -77,12 +76,12 @@ func (b *GreenhouseProvider) NewGreenhouse() *Greenhouse {
 	return b.Greenhouse
 }
 
-//NewUsers
+// NewUsers
 func (b *GreenhousesProvider) NewGreenhouses() *Greenhouses {
 	return b.Greenhouses
 }
 
-//serves user methods
+// serves user methods
 func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -103,7 +102,7 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//serves Greenhouses methods
+// serves Greenhouses methods
 func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -123,7 +122,6 @@ func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		method := r.Header.Get("Method")
 		var res []byte
 		var err error
-		fmt.Println(res, err)
 		if method == "add" {
 			fmt.Println("post Greenhouse add")
 			res, err = b.AddGreenhouseHandler(w, r)

@@ -1,5 +1,5 @@
 CREATE TABLE sprouts (
-  `id` INT AUTO_INCREMENT PRIMARY KEY,
+	`id` INT unsigned primary key NOT NULL AUTO_INCREMENT,
   `sproutuid` varchar(36) NOT NULL,
   `pH` FLOAT NOT NULL CHECK (pH >= 4 AND pH <= 8),
   `TDS` INT NOT NULL CHECK (TDS >= 300 AND TDS <= 3500),

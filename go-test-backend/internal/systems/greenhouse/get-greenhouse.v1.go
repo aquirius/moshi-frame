@@ -54,7 +54,6 @@ func (l *Greenhouse) GetGreenhouseHandler(w http.ResponseWriter, r *http.Request
 	vars := mux.Vars(r)
 	ctx := context.Background()
 
-	fmt.Println("get greenhouse vars", vars["guid"], vars["uuid"])
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 	guid, _ := strconv.ParseUint(vars["guid"], 0, 32)
 
@@ -68,7 +67,6 @@ func (l *Greenhouse) GetGreenhouseHandler(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(res)
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
 		log.Fatal("error in json")

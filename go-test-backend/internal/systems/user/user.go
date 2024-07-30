@@ -69,32 +69,36 @@ func NewUsersProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlP
 	}
 }
 
-//NewUser
+// NewUser
 func (b *UserProvider) NewUser() *User {
 	return b.User
 }
 
-//NewUsers
+// NewUsers
 func (b *UsersProvider) NewUsers() *Users {
 	return b.Users
 }
 
+// generate a unique Id to use in our current session
 func (c *User) generateSessionID() string {
 	b := make([]byte, 8)
 	rand.Read(b)
 	return fmt.Sprintf("%x", b)
 }
 
+// encrypt
 func (c *User) encryptPassword(pw string) string {
 	crypt := md5.New()
 	io.WriteString(crypt, pw)
 	return fmt.Sprintf("%x", crypt.Sum(nil))
 }
 
+// marshall request
 func (c SessionUser) MarshalBinary() ([]byte, error) {
 	return json.Marshal(c)
 }
 
+// GetUserID
 func (l *User) GetUserID(uuid uint64) int {
 	var query = "SELECT id FROM users WHERE uuid=?;"
 	var id int
@@ -105,7 +109,7 @@ func (l *User) GetUserID(uuid uint64) int {
 	return id
 }
 
-//serves users methods
+// serves users methods
 func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -146,7 +150,7 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//serves user methods
+// serves user methods
 func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -193,7 +197,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if method == "register" {
 			fmt.Println("post user register")
 			res, err = user.RegisterUserHandler(w, r)
-			fmt.Println(res, err)
 			if err != nil {
 				if err.Error() == "display name already taken" {
 					w.WriteHeader(http.StatusConflict)

@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 
 	"net/http"
 )
@@ -20,10 +19,8 @@ type LogoutUserV1Params struct {
 type LogoutUserV1Result struct {
 }
 
-//LogoutUserV1 verifys user logout
+// LogoutUserV1 verifys user logout
 func (l *User) LogoutUserV1(ctx context.Context, p *LogoutUserV1Params) (*LogoutUserV1Result, error) {
-	//res := &LogoutUserV1Result{}
-	fmt.Println("logout params", *p)
 	//we have no session id so we are already logged out
 	if p.SessionID == "" {
 		return nil, nil
@@ -34,7 +31,7 @@ func (l *User) LogoutUserV1(ctx context.Context, p *LogoutUserV1Params) (*Logout
 	return nil, nil
 }
 
-//LogoutUserHandler handles logout user request
+// LogoutUserHandler handles logout user request
 func (l *User) LogoutUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	req := &LogoutUserV1Params{}
 	ctx := context.Background()

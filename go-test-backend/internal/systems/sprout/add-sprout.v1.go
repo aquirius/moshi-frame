@@ -30,18 +30,18 @@ type AddSproutV1Result struct {
 
 // GetUserV1 gets user by uuid
 func (l *Sprout) AddSproutV1(ctx context.Context, p *AddSproutV1Params) (*AddSproutV1Result, error) {
-	spuid, err := uuid.NewUUID()
+	sproutuid, err := uuid.NewRandom()
 	stack := stack.NewStackProvider(ctx, l.dbh, l.rdb, "")
 	stackID := stack.Stack.GetStackID(p.SUID)
 
 	query := "INSERT INTO sprouts (sproutuid, stack_id, pH, TDS, ORP, h2oTemp, airTemp, humidity) VALUES (?,?,?,?,?,?,?,?);"
-	_, err = l.dbh.Exec(query, spuid.ID(), stackID, 5.5, 1000, 450, 20.3, 26.5, 69)
+	_, err = l.dbh.Exec(query, sproutuid.ID(), stackID, 5.5, 1000, 450, 20.3, 26.5, 69)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &AddSprout{
-		SPUID: uint64(spuid.ID()),
+		SPUID: uint64(sproutuid.ID()),
 	}
 
 	return &AddSproutV1Result{Sprout: *res}, nil
@@ -53,6 +53,7 @@ func (l *Sprout) AddSproutHandler(w http.ResponseWriter, r *http.Request) ([]byt
 	ctx := context.Background()
 
 	suid, _ := strconv.ParseUint(vars["suid"], 0, 32)
+
 	req := &AddSproutV1Params{
 		SUID: suid,
 	}

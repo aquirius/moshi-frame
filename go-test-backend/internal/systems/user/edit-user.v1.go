@@ -34,7 +34,6 @@ type EditUserV1Params struct {
 func (l *Users) EditUserV1(p *EditUserV1Params) error {
 	var query string
 	var arguments = []any{}
-	fmt.Println(*p.DisplayName, *p.FirstName, *p.LastName, *p.Email)
 	if *p.DisplayName == "" && *p.FirstName == "" && *p.LastName == "" && *p.Email == "" {
 		return nil
 	}

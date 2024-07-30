@@ -4,14 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"test-backend/m/v2/internal/systems/stack"
 )
 
-// GetUser
+// GetSprout
 type GetSprout struct {
 	SproutUID uint64  `db:"sproutuid"`
 	PH        float64 `db:"pH"`
@@ -22,12 +21,12 @@ type GetSprout struct {
 	Humidity  float64 `db:"humidity"`
 }
 
-// GetUserV1Params
+// GetSproutV1Params
 type GetSproutV1Params struct {
 	SUID uint64 `json:"suid"`
 }
 
-// GetUserV1Result
+// GetSproutV1Result
 type GetSproutV1Result struct {
 	Sprout GetSprout `json:"sprout"`
 }
@@ -38,26 +37,21 @@ func (l *Sprout) GetSproutV1(ctx context.Context, p *GetSproutV1Params) (*GetSpr
 	stack := stack.NewStackProvider(ctx, l.dbh, l.rdb, "")
 	stackID := stack.Stack.GetStackID(p.SUID)
 
-	fmt.Println(stackID)
-
-	err := l.dbh.Select(&sprout, "SELECT sproutuid, pH, TDS, ORP, h2oTemp, airTemp, humidity FROM sprouts WHERE stack_id=?;", stackID)
+	err := l.dbh.Get(&sprout, "SELECT sproutuid, pH, TDS, ORP, h2oTemp, airTemp, humidity FROM sprouts WHERE stack_id=?;", stackID)
 	if err == sql.ErrNoRows {
 		return nil, err
 	}
 
-	fmt.Println(sprout)
-
 	return &GetSproutV1Result{Sprout: sprout}, nil
 }
 
-// GetUserHandler handles get user request
+// GetSproutHandler handles get sqrout request
 func (l *Sprout) GetSproutHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	ctx := context.Background()
 
 	req := &GetSproutV1Params{}
 	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
-	fmt.Println(req)
 	res, err := l.GetSproutV1(ctx, req)
 	if err != nil {
 		return nil, err

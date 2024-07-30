@@ -4,32 +4,30 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"test-backend/m/v2/internal/systems/stack"
 )
 
-// GetUser
+// GetPots
 type GetPots struct {
 	PUID uint64 `db:"puid"`
 }
 
-// GetUserV1Params
+// GetPotsV1Params
 type GetPotsV1Params struct {
 	SUID uint64 `json:"suid"`
 }
 
-// GetUserV1Result
+// GetPotsV1Result
 type GetPotsV1Result struct {
 	Pots []GetPots `json:"pots"`
 }
 
-// GetUserV1 gets user by uuid
+// GetPotsV1 gets pots by suid
 func (l *Pot) GetPotsV1(ctx context.Context, p *GetPotsV1Params) (*GetPotsV1Result, error) {
 	pots := []uint64{}
-	//_ = ctx.Value("pots_id")
 	stack := stack.NewStackProvider(ctx, l.dbh, l.rdb, "")
 	stackID := stack.Stack.GetStackID(p.SUID)
 
@@ -55,7 +53,6 @@ func (l *Pot) GetPotsHandler(w http.ResponseWriter, r *http.Request) ([]byte, er
 	req := &GetPotsV1Params{}
 	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
-	fmt.Println(req)
 	res, err := l.GetPotsV1(ctx, req)
 	if err != nil {
 		return nil, err
