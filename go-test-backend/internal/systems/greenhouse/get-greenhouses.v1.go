@@ -20,6 +20,15 @@ type GetGreenhouses struct {
 	GUID    uint64 `db:"guid"`
 	Address string `db:"address"`
 	Zip     uint64 `db:"zip"`
+
+	DisplayName *string  `db:"display_name"`
+	Status      *string  `db:"status"`
+	Destination *string  `db:"destination"`
+	TempIn      *float64 `db:"tempIn"`
+	TempOut     *float64 `db:"tempOut"`
+	Humidity    *float64 `db:"humidity"`
+	Brightness  *float64 `db:"brightness"`
+	Co2         *float64 `db:"co2"`
 }
 
 // GetUserV1Params
@@ -49,7 +58,7 @@ func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1P
 	getGreenhouses := []GetGreenhouses{}
 	for _, v := range greenhouses {
 		res := []GetGreenhouses{}
-		err = l.dbh.Select(&res, "SELECT guid, address, zip FROM greenhouses WHERE id=?;", v)
+		err = l.dbh.Select(&res, "SELECT guid, display_name, address, zip, status, destination, tempIn, tempOut, humidity, brightness, co2 FROM greenhouses WHERE id=?;", v)
 		if err == sql.ErrNoRows {
 			fmt.Println("no rows")
 			return nil, err

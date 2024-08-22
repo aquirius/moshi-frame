@@ -22,9 +22,16 @@ type AddGreenhouse struct {
 
 // GetUserV1Params
 type AddGreenhouseV1Params struct {
-	UUID   uint64 `json:"uuid"`
-	Adress string `json:"adress"`
-	Zip    int16  `json:"zip"`
+	UUID        uint64   `json:"uuid"`
+	Adress      string   `json:"adress"`
+	Zip         int16    `json:"zip"`
+	Destination string   `json:"destination"`
+	Status      string   `json:"status"`
+	TempIn      *float64 `json:"tempIn"`
+	TempOut     *float64 `json:"tempOut"`
+	Humidity    *float64 `json:"humidity"`
+	Brightness  *float64 `json:"brightness"`
+	Co2         *float64 `json:"co2"`
 }
 
 // GetUserV1Result
@@ -83,11 +90,24 @@ func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Reques
 
 	fmt.Println("redisSession add greenhouse", vars["uuid"], redisSession)
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
+
 	zip := 88965
+	// tempIn := 27.5       //16-32
+	// tempOut := 30.5      // 16-32
+	// humidity := 65.0     //55 - 85
+	// brightness := 1500.0 // 200 - 2000
+	// co2 := 400.0         //  380 - 450
 	req := &AddGreenhouseV1Params{
-		UUID:   uuid,
-		Adress: "Hinterdupfing",
-		Zip:    int16(zip),
+		UUID:        uuid,
+		Adress:      "Hinterdupfing",
+		Zip:         int16(zip),
+		Destination: "indoor",
+		Status:      "active",
+		TempIn:      nil,
+		TempOut:     nil,
+		Humidity:    nil,
+		Brightness:  nil,
+		Co2:         nil,
 	}
 	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)

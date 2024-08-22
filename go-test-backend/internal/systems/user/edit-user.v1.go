@@ -9,15 +9,15 @@ import (
 
 // EditUser
 type EditUser struct {
-	Email           string `json:"email"`
-	DisplayName     string `json:"display_name"`
-	Title           string `json:"title"`
-	Salutation      string `json:"salutation"`
-	FirstName       string `json:"first_name"`
-	LastName        string `json:"last_name"`
-	DisplayLanguage string `json:"language"`
-	Country         string `json:"country"`
-	Password        string `json:"password"`
+	Email           string `db:"email"`
+	DisplayName     string `db:"display_name"`
+	Title           string `db:"title"`
+	Salutation      string `db:"salutation"`
+	FirstName       string `db:"first_name"`
+	LastName        string `db:"last_name"`
+	DisplayLanguage string `db:"language"`
+	Country         string `db:"country"`
+	Password        string `db:"password"`
 }
 
 // EditUserV1Params
