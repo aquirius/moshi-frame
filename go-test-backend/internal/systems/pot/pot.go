@@ -2,6 +2,7 @@ package pot
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/http"
 
@@ -32,6 +33,16 @@ func NewPotProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPre
 
 func (b *PotProvider) NewPot() *Pot {
 	return b.Pot
+}
+
+func (pot *Pot) GetPotID(puid uint64) int {
+	var query = "SELECT id FROM pots WHERE puid=?;"
+	var id int
+	err := pot.dbh.Get(&id, query, puid)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
 }
 
 // serves user methods

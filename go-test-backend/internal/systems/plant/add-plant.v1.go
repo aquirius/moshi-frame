@@ -8,17 +8,15 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 )
 
-// GetUser
+// AddPlant
 type AddPlant struct {
-	UUID        string `db:"uuid"`
+	PLUID       string `db:"pluid"`
 	TS          string `db:"registered_ts"`
 	DisplayName string `db:"display_name"`
 	FirstName   string `db:"first_name"`
@@ -27,14 +25,14 @@ type AddPlant struct {
 	Birthday    string `db:"birthday"`
 }
 
-// GetUserV1Params
+// AddPlantV1Params
 type AddPlantV1Params struct {
-	UUID uint64 `json:"uuid"`
+	PUID uint64 `json:"puid"`
 }
 
-// GetUserV1Result
+// AddPlantV1Result
 type AddPlantV1Result struct {
-	UUID uint64 `json:"uuid"`
+	PLUID uint64 `json:"pluid"`
 }
 
 func (l *Plant) existingPLUID(uuid uint32) bool {
@@ -60,11 +58,10 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 // GetUserV1 gets user by uuid
 func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV1Result, error) {
 	pluid, err := uuid.NewUUID()
-	puid, err := uuid.NewUUID()
 
 	//userID := ctx.Value("user_id")
-
 	//userID := l.getUserID(p.UUID)
+	potID := l.GetPotID(p.PUID)
 
 	query := "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
 	result, err := l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -76,28 +73,19 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 		return nil, err
 	}
 
-	query = "INSERT INTO pots (puid, stack_id, user_id) VALUES (?,?,?);"
-	result, err = l.dbh.Exec(query, puid.ID(), 0, 1)
+	query = "INSERT INTO plants (pluid, created_ts, planted_ts, nutrient_id, pot_id) VALUES (?,?,?,?,?);"
+	result, err = l.dbh.Exec(query, pluid.ID(), time.Now().Unix(), time.Now().Unix(), nutrientID, potID)
 	if err != nil {
 		return nil, err
 	}
-	potID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
+	plantID, err := result.LastInsertId()
+	fmt.Println("last inser id of plant", plantID)
 
-	query = "INSERT INTO plants (pluid, created_ts, harvested_ts, nutrient_id, pot_id) VALUES (?,?,?,?,?);"
-	_, err = l.dbh.Exec(query, pluid.ID(), time.Now().Unix(), time.Now().Unix(), nutrientID, potID)
-	if err != nil {
-		return nil, err
-	}
-
-	return &AddPlantV1Result{UUID: uint64(pluid.ID())}, nil
+	return &AddPlantV1Result{PLUID: uint64(pluid.ID())}, nil
 }
 
 // GetUserHandler handles get user request
 func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
-	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
@@ -113,11 +101,7 @@ func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 			panic(err)
 		}
 	}
-	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
-
-	req := &AddPlantV1Params{
-		UUID: uuid,
-	}
+	req := &AddPlantV1Params{}
 	fmt.Println(req)
 
 	reqBody, _ := io.ReadAll(r.Body)

@@ -45,6 +45,16 @@ func (l *Plant) GetPlantID(pluid uint64) int {
 	return id
 }
 
+func (l *Plant) GetPotID(puid uint64) int {
+	var query = "SELECT id FROM pots WHERE puid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, puid)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
 // serves user methods
 func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
@@ -54,6 +64,17 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case r.Method == http.MethodPost:
 		fmt.Println("add plant")
 		res, err := plant.AddPlantHandler(w, r)
+		if err != nil {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+		return
+	case r.Method == http.MethodGet:
+		fmt.Println("get plant")
+		res, err := plant.GetPlantHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte(err.Error()))

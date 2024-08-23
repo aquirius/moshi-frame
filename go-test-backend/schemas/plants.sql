@@ -5,7 +5,6 @@ CREATE TABLE `plants` (
   `created_ts` int unsigned NOT NULL,
   `planted_ts` int unsigned NOT NULL,
   `harvested_ts` int unsigned NOT NULL,
-  
   `nutrient_id` int unsigned NOT NULL,
   `pot_id` int unsigned NOT NULL,
   PRIMARY KEY (`id`),

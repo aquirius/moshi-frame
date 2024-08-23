@@ -101,10 +101,10 @@ func main() {
 	mux.HandleFunc("/user/{uuid}", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouses", greenhousesH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}", greenhouseH.ServeHTTP)
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/plant", plantH.ServeHTTP)
-	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/pot", potH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack", stackH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}", sproutH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/pot", potH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/pot/{puid}/plant", plantH.ServeHTTP)
 	mux.HandleFunc("/users", usersH.ServeHTTP)
 	//todo .env
 	http.ListenAndServe("127.0.1:1234", mux)
