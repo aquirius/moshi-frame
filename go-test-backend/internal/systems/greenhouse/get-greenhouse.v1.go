@@ -15,12 +15,18 @@ import (
 
 // GetUser
 type GetGreenhouse struct {
-	GUID        uint64 `db:"guid"`
-	DisplayName string `db:"display_name"`
-	Address     string `db:"address"`
-	Zip         uint64 `db:"zip"`
-	Status      string `db:"status"`
-	Type        string `db:"type"`
+	GUID    uint64 `db:"guid"`
+	Address string `db:"address"`
+	Zip     uint64 `db:"zip"`
+
+	DisplayName *string  `db:"display_name"`
+	Status      *string  `db:"status"`
+	Destination *string  `db:"destination"`
+	TempIn      *float64 `db:"tempIn"`
+	TempOut     *float64 `db:"tempOut"`
+	Humidity    *float64 `db:"humidity"`
+	Brightness  *float64 `db:"brightness"`
+	Co2         *float64 `db:"co2"`
 }
 
 // GetUserV1Params
@@ -38,7 +44,7 @@ type GetGreenhouseV1Result struct {
 func (l *Greenhouse) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Params) (*GetGreenhouseV1Result, error) {
 	greenhouse := GetGreenhouse{}
 	v := ctx.Value("greenhouse_id")
-	err := l.dbh.Get(&greenhouse, "SELECT guid, display_name, address, zip, status, type FROM greenhouses WHERE guid=?;", p.GUID)
+	err := l.dbh.Get(&greenhouse, "SELECT guid, display_name, address, zip, status, destination, tempIn, tempOut, humidity, brightness, co2 FROM greenhouses WHERE guid=?;", p.GUID)
 	if err == sql.ErrNoRows {
 		fmt.Println("no rows")
 		return nil, err

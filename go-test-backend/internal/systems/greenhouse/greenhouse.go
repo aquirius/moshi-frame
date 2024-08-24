@@ -97,8 +97,8 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 		return
-	case r.Method == http.MethodPut:
-		fmt.Println("put greenhouse")
+	case r.Method == http.MethodPost:
+		fmt.Println("post greenhouse")
 		res, err := b.EditGreenhouseHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
