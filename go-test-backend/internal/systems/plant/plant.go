@@ -63,12 +63,27 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.Method == http.MethodPost:
 		fmt.Println("add plant")
-		res, err := plant.AddPlantHandler(w, r)
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(err.Error()))
-			return
+		method := r.Header.Get("Method")
+		var res []byte
+		var err error
+		fmt.Println(method)
+		if method == "add" {
+			res, err = plant.AddPlantHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
 		}
+		if method == "harvest" {
+			res, err = plant.HarvestPlantHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
+		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 		return
@@ -76,7 +91,13 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("get plant")
 		res, err := plant.GetPlantHandler(w, r)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
+			if err == sql.ErrNoRows {
+				w.WriteHeader(http.StatusOK)
+				w.Write(res)
+				return
+			} else {
+				w.WriteHeader(http.StatusUnauthorized)
+			}
 			w.Write([]byte(err.Error()))
 			return
 		}
