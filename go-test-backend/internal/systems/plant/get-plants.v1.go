@@ -23,17 +23,43 @@ type GetPlantsV1Result struct {
 	Plants []GetPlant `json:"plants"`
 }
 
+func (l *Plants) GetPlantNutrients(nutriendID int) Nutrients {
+	var query = "SELECT carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium FROM nutrients WHERE id=?;"
+	nutrients := Nutrients{}
+	err := l.dbh.Get(&nutrients, query, nutriendID)
+	if err != nil && err == sql.ErrNoRows {
+		return Nutrients{0, 0, 0, 0, 0, 0, 0, 0, 0}
+	}
+	return nutrients
+}
+
+func (l *Plants) GetPlantCrop(cropID int) Crop {
+	var query = "SELECT cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max FROM crops WHERE id=?;"
+	crop := Crop{}
+	err := l.dbh.Get(&crop, query, cropID)
+	if err != nil && err == sql.ErrNoRows {
+		return Crop{0, "", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+	}
+
+	return crop
+}
+
 // GetUserV1 gets user by uuid
-func (l *Plant) GetPlantsV1(ctx context.Context, p *GetPlantsV1Params) (*GetPlantsV1Result, error) {
+func (l *Plants) GetPlantsV1(ctx context.Context, p *GetPlantsV1Params) (*GetPlantsV1Result, error) {
 	plants := []GetPlant{}
 	for _, v := range p.PUID {
+		potID := l.GetPotID(v)
 		res := GetPlant{}
-		err := l.dbh.Select(&res, "SELECT nutrient_id, pluid, created_ts, planted_ts, harvested_ts FROM plants WHERE pot_id=?;", v)
-		if err == sql.ErrNoRows {
+		err := l.dbh.Get(&res, "SELECT crop_id, nutrient_id, pluid, created_ts, planted_ts, harvested_ts FROM plants WHERE pot_id=?;", potID)
+		if err != nil && err != sql.ErrNoRows {
 			fmt.Println("no rows")
 			return nil, err
 		}
-		res.Nutrients = *l.GetPlantNutrients(res.NutrientID)
+		res.Nutrients = l.GetPlantNutrients(res.NutrientID)
+		res.Crop = l.GetPlantCrop(res.CropID)
+
+		fmt.Println(res)
+
 		plants = append(plants, res)
 	}
 
@@ -41,7 +67,7 @@ func (l *Plant) GetPlantsV1(ctx context.Context, p *GetPlantsV1Params) (*GetPlan
 }
 
 // GetUserHandler handles get user request
-func (l *Plant) GetPlantsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+func (l *Plants) GetPlantsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()

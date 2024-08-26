@@ -10,7 +10,7 @@ import (
 	stack "test-backend/m/v2/internal/systems/stack"
 	user "test-backend/m/v2/internal/systems/user"
 
-	"test-backend/m/v2/server"
+	server "test-backend/m/v2/server"
 
 	redis "github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
@@ -20,11 +20,13 @@ import (
 
 // Runtime points to our systems
 type Runtime struct {
-	db    *sqlx.DB
-	rdb   *redis.Client
-	user  *user.User
-	users *user.Users
-	plant *plant.Plant
+	db     *sqlx.DB
+	rdb    *redis.Client
+	user   *user.User
+	users  *user.Users
+	plant  *plant.Plant
+	plants *plant.Plants
+
 	pot   *pot.Pot
 	stack *stack.Stack
 
@@ -47,13 +49,16 @@ func BuildRuntime() Runtime {
 	//init user
 	userProvider := user.NewUserProvider(context, &server.Sql, &server.Redis, "sql")
 	user := userProvider.NewUser()
+	//init plants
+	plantsProvider := plant.NewPlantsProvider(context, &server.Sql, &server.Redis, "sql")
+	plants := plantsProvider.NewPlants()
 	//init plant
 	plantProvider := plant.NewPlantProvider(context, &server.Sql, &server.Redis, "sql")
 	plant := plantProvider.NewPlant()
-	//init plant
+	//init pot
 	potProvider := pot.NewPotProvider(context, &server.Sql, &server.Redis, "sql")
 	pot := potProvider.NewPot()
-	//init plant
+	//init stack
 	stackProvider := stack.NewStackProvider(context, &server.Sql, &server.Redis, "sql")
 	stack := stackProvider.NewStack()
 	//init greenhouses
@@ -67,11 +72,13 @@ func BuildRuntime() Runtime {
 	sprout := sproutProvider.NewSprout()
 
 	return Runtime{
-		db:          &server.Sql,
-		rdb:         &server.Redis,
-		user:        user,
-		users:       users,
-		plant:       plant,
+		db:     &server.Sql,
+		rdb:    &server.Redis,
+		user:   user,
+		users:  users,
+		plant:  plant,
+		plants: plants,
+
 		pot:         pot,
 		stack:       stack,
 		greenhouse:  greenhouse,
@@ -89,6 +96,7 @@ func main() {
 	userH := rt.user
 	usersH := rt.users
 	plantH := rt.plant
+	plantsH := rt.plants
 	potH := rt.pot
 	stackH := rt.stack
 	greenhouseH := rt.greenhouse
@@ -104,6 +112,7 @@ func main() {
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack", stackH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}", sproutH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/pot", potH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/plants", plantsH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/pot/{puid}/plant", plantH.ServeHTTP)
 	mux.HandleFunc("/users", usersH.ServeHTTP)
 	//todo .env

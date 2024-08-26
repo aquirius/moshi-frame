@@ -25,8 +25,26 @@ type Nutrients struct {
 	Magnesium  uint16 `db:"magnesium"`
 }
 
+type Crop struct {
+	CUID         uint64  `db:"cuid"`
+	CropName     string  `db:"crop_name"`
+	AirTempMin   float64 `db:"air_temp_min"`
+	AirTempMax   float64 `db:"air_temp_max"`
+	HumidityMin  float64 `db:"humidity_min"`
+	HumidityMax  float64 `db:"humidity_max"`
+	PHLevelMin   float64 `db:"ph_level_min"`
+	PHLevelMax   float64 `db:"ph_level_max"`
+	OrpMin       float64 `db:"orp_min"`
+	OrpMax       float64 `db:"orp_max"`
+	TdsMin       uint16  `db:"tds_min"`
+	TdsMax       uint16  `db:"tds_max"`
+	WaterTempMin float64 `db:"water_temp_min"`
+	WaterTempMax float64 `db:"water_temp_max"`
+}
+
 // GetPlant
 type GetPlant struct {
+	CropID      int    `db:"crop_id"`
 	NutrientID  int    `db:"nutrient_id"`
 	PLUID       uint64 `db:"pluid"`
 	CreatedTS   uint64 `db:"created_ts"`
@@ -34,6 +52,7 @@ type GetPlant struct {
 	HarvestedTS uint64 `db:"harvested_ts"`
 
 	Nutrients Nutrients
+	Crop      Crop
 }
 
 // GetPlantV1Params
@@ -53,8 +72,17 @@ func (l *Plant) GetPlantNutrients(nutriendID int) *Nutrients {
 	if err != nil && err == sql.ErrNoRows {
 		return nil
 	}
-	fmt.Println(&nutrients)
 	return &nutrients
+}
+
+func (l *Plant) GetPlantCrop(cropID int) *Crop {
+	var query = "SELECT cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max FROM crops WHERE id=?;"
+	crop := Crop{}
+	err := l.dbh.Get(&crop, query, cropID)
+	if err != nil && err == sql.ErrNoRows {
+		return nil
+	}
+	return &crop
 }
 
 // GetPlantV1 gets pots by suid
@@ -66,13 +94,16 @@ func (l *Plant) GetPlantV1(ctx context.Context, p *GetPlantV1Params) (*GetPlantV
 	var query = ""
 	var err error
 
-	query = "SELECT nutrient_id, pluid, created_ts, planted_ts, harvested_ts FROM plants WHERE pot_id=?;"
+	query = "SELECT crop_id, nutrient_id, pluid, created_ts, planted_ts, harvested_ts FROM plants WHERE pot_id=?;"
 	err = l.dbh.Get(&plant, query, potID)
 	if err == sql.ErrNoRows {
 		return nil, err
 	}
 
 	plant.Nutrients = *l.GetPlantNutrients(plant.NutrientID)
+	plant.Crop = *l.GetPlantCrop(plant.CropID)
+
+	fmt.Println(plant.Crop)
 
 	return &GetPlantV1Result{Plant: plant}, nil
 }

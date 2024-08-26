@@ -56,6 +56,10 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+	crops, err := os.ReadFile("./schemas/crops.sql")
+	if err != nil {
+		panic(err.Error())
+	}
 	nutrients, err := os.ReadFile("./schemas/nutrients.sql")
 	if err != nil {
 		panic(err.Error())
@@ -87,6 +91,7 @@ func main() {
 
 	out = append(out,
 		string(greenhouse),
+		string(crops),
 		string(nutrients),
 		string(plans),
 		string(plants),

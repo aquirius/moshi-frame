@@ -31,8 +31,33 @@ func NewPlantProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlP
 	}
 }
 
+// PlantProvider provides *Plant
+type PlantsProvider struct {
+	Plants *Plants
+}
+
+// Plant is capable of providing core access
+type Plants struct {
+	dbh *sqlx.DB
+	rdb *redis.Client
+}
+
+// NewCoreProvider returns a new Core provider
+func NewPlantsProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *PlantsProvider {
+	return &PlantsProvider{
+		&Plants{
+			dbh: dbh,
+			rdb: rdb,
+		},
+	}
+}
+
 func (b *PlantProvider) NewPlant() *Plant {
 	return b.Plant
+}
+
+func (b *PlantsProvider) NewPlants() *Plants {
+	return b.Plants
 }
 
 func (l *Plant) GetPlantID(pluid uint64) int {
@@ -46,6 +71,16 @@ func (l *Plant) GetPlantID(pluid uint64) int {
 }
 
 func (l *Plant) GetPotID(puid uint64) int {
+	var query = "SELECT id FROM pots WHERE puid=?;"
+	var id int
+	err := l.dbh.Get(&id, query, puid)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
+func (l *Plants) GetPotID(puid uint64) int {
 	var query = "SELECT id FROM pots WHERE puid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, puid)
@@ -83,7 +118,6 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
-
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 		return
@@ -104,6 +138,33 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 		return
+	default:
+		return
+	}
+}
+
+func (plants *Plants) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
+	switch {
+	case r.Method == http.MethodPost:
+		method := r.Header.Get("Method")
+		var res []byte
+		var err error
+		fmt.Println(method)
+		if method == "get-many" {
+			res, err = plants.GetPlantsHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+		return
+
 	default:
 		return
 	}

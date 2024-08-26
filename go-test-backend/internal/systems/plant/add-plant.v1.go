@@ -27,7 +27,8 @@ type AddPlant struct {
 
 // AddPlantV1Params
 type AddPlantV1Params struct {
-	PUID uint64 `json:"puid"`
+	PUID     uint64 `json:"puid"`
+	CropName string `json:"cropName"`
 }
 
 // AddPlantV1Result
@@ -55,26 +56,61 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 	return true
 }
 
+func (l *Plant) getCropIDByName(name string) int {
+	var query = "SELECT id FROM crops WHERE crop_name=?;"
+	var id int
+	err := l.dbh.Get(&id, query, id)
+	if err != nil && err == sql.ErrNoRows {
+		return 0
+	}
+	return id
+}
+
 // GetUserV1 gets user by uuid
 func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV1Result, error) {
-	pluid, err := uuid.NewUUID()
+	var query string
+	var err error
+	var result sql.Result
+	var nutrientID int64
+	var pluid uuid.UUID
+	//var cuid uuid.UUID
+
+	pluid, err = uuid.NewUUID()
+	//cuid, err = uuid.NewUUID()
 
 	//userID := ctx.Value("user_id")
 	//userID := l.getUserID(p.UUID)
 	potID := l.GetPotID(p.PUID)
+	cropID := l.getCropIDByName(p.CropName)
 
-	query := "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
-	result, err := l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+	fmt.Println(potID)
+
+	query = "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
+	result, err = l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 	if err != nil {
 		return nil, err
 	}
-	nutrientID, err := result.LastInsertId()
+	nutrientID, err = result.LastInsertId()
 	if err != nil {
 		return nil, err
 	}
+	// fmt.Println("test")
+	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+	// result, err = l.dbh.Exec(query, cuid.ID(), "lettuce", 18, 28, 60, 80, 5.0, 6.0, 400, 500, 800, 1200, 18.0, 22.0)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// fmt.Println(result, err)
+	// cuid, err = uuid.NewUUID()
+	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+	// result, err = l.dbh.Exec(query, cuid.ID(), "tomato", 18, 26, 50, 70, 5.5, 6.5, 400, 500, 700, 1100, 19.0, 24.0)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// cropID, err := result.LastInsertId()
 
-	query = "INSERT INTO plants (pluid, created_ts, planted_ts, nutrient_id, pot_id) VALUES (?,?,?,?,?);"
-	result, err = l.dbh.Exec(query, pluid.ID(), time.Now().Unix(), time.Now().Unix(), nutrientID, potID)
+	query = "INSERT INTO plants (pluid, created_ts, planted_ts, harvested_ts, crop_id, nutrient_id, pot_id) VALUES (?,?,?,?,?,?,?);"
+	result, err = l.dbh.Exec(query, pluid.ID(), time.Now().Unix(), time.Now().Unix(), time.Now().Unix()+2419200, cropID, nutrientID, potID)
 	if err != nil {
 		return nil, err
 	}
