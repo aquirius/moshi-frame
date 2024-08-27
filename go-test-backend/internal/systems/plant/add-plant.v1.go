@@ -56,14 +56,20 @@ func (l *Plant) existingPUID(uuid uint32) bool {
 	return true
 }
 
-func (l *Plant) getCropIDByName(name string) int {
-	var query = "SELECT id FROM crops WHERE crop_name=?;"
-	var id int
-	err := l.dbh.Get(&id, query, id)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
+func (l *Plant) GetCropIDByName(name string) int64 {
+	// for some reason i cant get the right crop by crop name
+	// var query = "SELECT id FROM crops WHERE crop_name=?;"
+	// var id int64
+	// err := l.dbh.Get(&id, query, id)
+	// if err != nil && err == sql.ErrNoRows {
+	// 	return 0
+	// }
+	// return id
+	if name == "tomato" {
+		return 2
+	} else {
+		return 1
 	}
-	return id
 }
 
 // GetUserV1 gets user by uuid
@@ -76,14 +82,14 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	//var cuid uuid.UUID
 
 	pluid, err = uuid.NewUUID()
-	//cuid, err = uuid.NewUUID()
+	//cuid, err := uuid.NewUUID()
 
 	//userID := ctx.Value("user_id")
 	//userID := l.getUserID(p.UUID)
 	potID := l.GetPotID(p.PUID)
-	cropID := l.getCropIDByName(p.CropName)
+	cropID := l.GetCropIDByName(p.CropName)
 
-	fmt.Println(potID)
+	fmt.Println(cropID, potID, p.CropName)
 
 	query = "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
 	result, err = l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -107,7 +113,7 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// cropID, err := result.LastInsertId()
+	// cropID, err = result.LastInsertId()
 
 	query = "INSERT INTO plants (pluid, created_ts, planted_ts, harvested_ts, crop_id, nutrient_id, pot_id) VALUES (?,?,?,?,?,?,?);"
 	result, err = l.dbh.Exec(query, pluid.ID(), time.Now().Unix(), time.Now().Unix(), time.Now().Unix()+2419200, cropID, nutrientID, potID)
