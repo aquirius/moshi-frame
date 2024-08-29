@@ -48,11 +48,15 @@ func run(name string, cmds []string, stdin []byte) error {
 func main() {
 	out := []string{}
 
-	greenhouse, err := os.ReadFile("./schemas/greenhouses.sql")
+	greenhouses, err := os.ReadFile("./schemas/greenhouses.sql")
 	if err != nil {
 		panic(err.Error())
 	}
 	userGreenhouse, err := os.ReadFile("./schemas/users-greenhouses.sql")
+	if err != nil {
+		panic(err.Error())
+	}
+	notifications, err := os.ReadFile("./schemas/notifications.sql")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -90,7 +94,8 @@ func main() {
 	}
 
 	out = append(out,
-		string(greenhouse),
+		string(greenhouses),
+		string(notifications),
 		string(crops),
 		string(nutrients),
 		string(plans),
