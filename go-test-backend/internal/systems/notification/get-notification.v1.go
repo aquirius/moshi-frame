@@ -17,8 +17,8 @@ type GetNotification struct {
 	CreatedTS int    `db:"created_ts"`
 	CheckedTS uint64 `db:"checked_ts"`
 	DoneTS    uint64 `db:"done_ts"`
-	Title     uint64 `db:"title"`
-	Message   uint64 `db:"message"`
+	Title     string `db:"title"`
+	Message   string `db:"message"`
 }
 
 // GetNotificationV1Params

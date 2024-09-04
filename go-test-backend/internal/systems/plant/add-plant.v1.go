@@ -89,8 +89,6 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	potID := l.GetPotID(p.PUID)
 	cropID := l.GetCropIDByName(p.CropName)
 
-	fmt.Println(cropID, potID, p.CropName)
-
 	query = "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
 	result, err = l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 	if err != nil {
@@ -144,8 +142,6 @@ func (l *Plant) AddPlantHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 		}
 	}
 	req := &AddPlantV1Params{}
-	fmt.Println(req)
-
 	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
 	res, err := l.AddPlantV1(ctx, req)

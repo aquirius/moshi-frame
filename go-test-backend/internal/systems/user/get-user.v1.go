@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	redis "github.com/go-redis/redis/v8"
@@ -27,12 +26,10 @@ type GetUserV1Result struct {
 // GetUserV1 gets user by uuid
 func (l *User) GetUserV1(ctx context.Context, p *GetUserV1Params) (*GetUserV1Result, error) {
 	user := GetUser{}
-	v := ctx.Value("session-id")
-	fmt.Println(v, p)
+	ctx.Value("session-id")
 
 	err := l.dbh.Get(&user, "SELECT uuid, registered_ts, display_name, first_name, last_name, email, birthday FROM users WHERE uuid=?", p.UUID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 
@@ -73,7 +70,6 @@ func (l *User) GetUserHandler(w http.ResponseWriter, r *http.Request) ([]byte, e
 	}
 	jsonBytes, err := json.Marshal(res)
 	if err != nil {
-		log.Fatal("error in json")
 		return nil, err
 	}
 	return jsonBytes, nil

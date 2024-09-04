@@ -2,7 +2,6 @@ package greenhouse
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -39,15 +38,6 @@ type EditGreenhouseV1Params struct {
 func (l *Greenhouse) EditGreenhouseV1(p *EditGreenhouseV1Params) error {
 	var query string
 	var arguments = []any{}
-
-	fmt.Println(*p.DisplayName)
-	fmt.Println(*p.Address)
-	fmt.Println(*p.Zip)
-	fmt.Println(*p.TempIn)
-	fmt.Println(*p.TempOut)
-	fmt.Println(*p.Humidity)
-	fmt.Println(p.GUID)
-
 	query += "UPDATE greenhouses SET "
 	if *p.DisplayName != "" {
 		arguments = append(arguments, *p.DisplayName)

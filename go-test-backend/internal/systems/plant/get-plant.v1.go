@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -102,8 +101,6 @@ func (l *Plant) GetPlantV1(ctx context.Context, p *GetPlantV1Params) (*GetPlantV
 
 	plant.Nutrients = *l.GetPlantNutrients(plant.NutrientID)
 	plant.Crop = *l.GetPlantCrop(plant.CropID)
-
-	fmt.Println(plant.Crop)
 
 	return &GetPlantV1Result{Plant: plant}, nil
 }

@@ -27,16 +27,16 @@ type GetNotificationsV1Result struct {
 
 // GetUserV1 gets user by uuid
 func (l *Notifications) GetNotificationsV1(ctx context.Context, p *GetNotificationsV1Params) (*GetNotificationsV1Result, error) {
-	plants := []GetNotification{}
+	notifications := []GetNotification{}
 	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
 	userID := user.User.GetUserID(p.UUID)
-	err := l.dbh.Get(&plants, "SELECT nuid, created_ts, checked_ts, done_ts, title, message FROM notifications WHERE user_id=?;", userID)
+	err := l.dbh.Select(&notifications, "SELECT nuid, created_ts, checked_ts, done_ts, title, message FROM notifications WHERE user_id=?;", userID)
+	fmt.Println(err)
 	if err != nil && err != sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 
-	return &GetNotificationsV1Result{Notifications: plants}, nil
+	return &GetNotificationsV1Result{Notifications: notifications}, nil
 }
 
 // GetUserHandler handles get user request
@@ -44,7 +44,7 @@ func (l *Notifications) GetNotificationsHandler(w http.ResponseWriter, r *http.R
 	vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
-	uuid, _ := strconv.ParseUint(vars["nuid"], 0, 32)
+	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 
 	var redisSession string
 	var err error

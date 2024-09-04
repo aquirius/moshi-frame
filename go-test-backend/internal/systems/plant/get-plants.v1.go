@@ -52,13 +52,10 @@ func (l *Plants) GetPlantsV1(ctx context.Context, p *GetPlantsV1Params) (*GetPla
 		res := GetPlant{}
 		err := l.dbh.Get(&res, "SELECT crop_id, nutrient_id, pluid, created_ts, planted_ts, harvested_ts FROM plants WHERE pot_id=?;", potID)
 		if err != nil && err != sql.ErrNoRows {
-			fmt.Println("no rows")
 			return nil, err
 		}
 		res.Nutrients = l.GetPlantNutrients(res.NutrientID)
 		res.Crop = l.GetPlantCrop(res.CropID)
-
-		fmt.Println(res)
 
 		plants = append(plants, res)
 	}

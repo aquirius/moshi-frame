@@ -2,7 +2,6 @@ package user
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -76,15 +75,11 @@ func (l *Users) EditUserHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	json.Unmarshal(reqBody, req)
 
 	err := l.EditUserV1(req)
-	fmt.Println(err)
-
 	if err != nil {
 		return nil, err
 	}
 
 	jsonBytes, err := json.Marshal("success")
-	fmt.Println(err)
-
 	if err != nil {
 		return nil, err
 	}

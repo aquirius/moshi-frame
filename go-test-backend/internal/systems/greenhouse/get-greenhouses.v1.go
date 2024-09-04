@@ -49,7 +49,6 @@ func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1P
 	v := ctx.Value("greenhouse_id")
 	err := l.dbh.Select(&greenhouses, "SELECT greenhouse_id FROM users_greenhouses WHERE user_id=?;", userID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 
@@ -60,7 +59,6 @@ func (l *Greenhouses) GetGreenhousesV1(ctx context.Context, p *GetGreenhousesV1P
 		res := []GetGreenhouses{}
 		err = l.dbh.Select(&res, "SELECT guid, display_name, address, zip, status, destination, tempIn, tempOut, humidity, brightness, co2 FROM greenhouses WHERE id=?;", v)
 		if err == sql.ErrNoRows {
-			fmt.Println("no rows")
 			return nil, err
 		}
 		getGreenhouses = append(getGreenhouses, res...)

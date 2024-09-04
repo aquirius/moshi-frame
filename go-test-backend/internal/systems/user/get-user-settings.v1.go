@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -36,7 +35,6 @@ func (l *User) GetUserSettingsV1(ctx context.Context, p *GetUserSettingsV1Params
 	//v := ctx.Value("session-id")
 	err := l.dbh.Get(&user, "SELECT uuid, registered_ts, display_name, first_name, last_name, email, birthday FROM users WHERE uuid=?", p.UUID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 

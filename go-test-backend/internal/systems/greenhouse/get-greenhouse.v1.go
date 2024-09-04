@@ -46,7 +46,6 @@ func (l *Greenhouse) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Para
 	v := ctx.Value("greenhouse_id")
 	err := l.dbh.Get(&greenhouse, "SELECT guid, display_name, address, zip, status, destination, tempIn, tempOut, humidity, brightness, co2 FROM greenhouses WHERE guid=?;", p.GUID)
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 
