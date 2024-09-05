@@ -284,7 +284,7 @@ func (l *Notifications) GetCropsPerSproutWithUser(userID int) []GetCropsPerSprou
 func (l *Notifications) CronNotification() error {
 	var err error
 	c := cron.New()
-	cronID, err := c.AddFunc("@every 10s", func() {
+	cronID, err := c.AddFunc("@every 1h", func() {
 		var query = ""
 
 		fmt.Println("hello")

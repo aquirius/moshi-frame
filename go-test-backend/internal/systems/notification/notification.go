@@ -74,14 +74,14 @@ func (l *Notification) GetNotificationID(nuid uint64) int {
 }
 
 // serves user methods
-func (plant *Notification) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (notification *Notification) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
 		fmt.Println("get plant")
-		res, err := plant.GetNotificationHandler(w, r)
+		res, err := notification.GetNotificationHandler(w, r)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusOK)
@@ -92,6 +92,23 @@ func (plant *Notification) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Write([]byte(err.Error()))
 			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+		return
+
+	case r.Method == http.MethodPost:
+		method := r.Header.Get("Method")
+		var res []byte
+		var err error
+		fmt.Println(method)
+		if method == "delete" {
+			res, err = notification.DeleteNotificationHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
 		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)

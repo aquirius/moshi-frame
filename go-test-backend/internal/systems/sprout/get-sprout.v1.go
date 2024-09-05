@@ -39,7 +39,7 @@ func (l *Sprout) GetSproutV1(ctx context.Context, p *GetSproutV1Params) (*GetSpr
 
 	err := l.dbh.Get(&sprout, "SELECT sproutuid, pH, TDS, ORP, h2oTemp, airTemp, humidity FROM sprouts WHERE stack_id=?;", stackID)
 	if err == sql.ErrNoRows {
-		return nil, err
+		return nil, nil
 	}
 
 	return &GetSproutV1Result{Sprout: sprout}, nil
