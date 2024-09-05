@@ -3,9 +3,11 @@ package sprout
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gorilla/websocket"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -32,6 +34,43 @@ func NewSproutProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, url
 
 func (b *SproutProvider) NewSprout() *Sprout {
 	return b.Sprout
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	// Allow all origins for simplicity in this example (modify for production use)
+	CheckOrigin: func(r *http.Request) bool { return true },
+}
+
+func (b *Sprout) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// Upgrade the HTTP request to a WebSocket connection
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Upgrade error:", err)
+		return
+	}
+	defer conn.Close()
+
+	// Read messages in a loop and echo them back
+	for {
+		// Read message from the WebSocket
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("Read error:", err)
+			break
+		}
+
+		// Print the received message
+		fmt.Printf("Received: %s\n", message)
+
+		// Echo the message back to the client
+		err = conn.WriteMessage(messageType, message)
+		if err != nil {
+			log.Println("Write error:", err)
+			break
+		}
+	}
 }
 
 // serves user methods

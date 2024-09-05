@@ -118,7 +118,7 @@ func main() {
 	sproutH := rt.sprout
 	notificationH := rt.notification
 	notificationsH := rt.notifications
-
+	mux.HandleFunc("/ws", sproutH.HandleWebSocket)
 	mux.HandleFunc("/login", userH.ServeHTTP)
 	mux.HandleFunc("/logout", userH.ServeHTTP)
 	mux.HandleFunc("/register", userH.ServeHTTP)
