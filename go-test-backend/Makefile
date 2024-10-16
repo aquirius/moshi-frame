@@ -14,4 +14,4 @@ test-all:
 	go test -v ./...
 
 load-schemas:
-	go run ./schemas/load.go
+	go run ./server/sql.go

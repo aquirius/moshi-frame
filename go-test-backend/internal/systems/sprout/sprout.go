@@ -2,9 +2,11 @@ package sprout
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
@@ -51,26 +53,58 @@ func (b *Sprout) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
+	
 
-	// Read messages in a loop and echo them back
-	for {
-		// Read message from the WebSocket
-		messageType, message, err := conn.ReadMessage()
-		if err != nil {
-			log.Println("Read error:", err)
-			break
-		}
-
-		// Print the received message
-		fmt.Printf("Received: %s\n", message)
-
-		// Echo the message back to the client
-		err = conn.WriteMessage(messageType, message)
-		if err != nil {
-			log.Println("Write error:", err)
-			break
-		}
+	req := &GetSproutV1Params{
+		SUID: 123123213,
 	}
+	jsonBytes, err := json.Marshal(req)
+	if err != nil {
+		log.Println("Write error:", err)
+	}
+
+	err = conn.WriteMessage(1, jsonBytes)
+	if err != nil {
+		log.Println("Write error:", err)
+	}
+
+	fmt.Println("test")
+
+	time.Sleep(time.Second)
+	fmt.Println("test2")
+
+	reqq := &GetSproutV1Params{
+		SUID: 65656556,
+	}
+	jsonBytess, err := json.Marshal(reqq)
+	if err != nil {
+		log.Println("Write error:", err)
+	}
+
+	err = conn.WriteMessage(1, jsonBytess)
+	if err != nil {
+		log.Println("Write error:", err)
+	}
+	// Read messages in a loop and echo them back
+	// for {
+	// 	// Read message from the WebSocket
+	// 	messageType, message, err := conn.ReadMessage()
+	// 	if err != nil {
+	// 		log.Println("Read error:", err)
+	// 		break
+	// 	}
+
+	// 	// Print the received message
+	// 	fmt.Printf("Received: %s\n", message)
+
+	// 	// Echo the message back to the client
+	// 	err = conn.WriteMessage(messageType, message)
+	// 	fmt.Println(messageType)
+	// 	if err != nil {
+	// 		log.Println("Write error:", err)
+	// 		break
+	// 	}
+	// }
 }
 
 // serves user methods

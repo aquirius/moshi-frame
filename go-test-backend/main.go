@@ -2,7 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
+
 	greenhouse "test-backend/m/v2/internal/systems/greenhouse"
 	"test-backend/m/v2/internal/systems/notification"
 	plant "test-backend/m/v2/internal/systems/plant"
@@ -17,6 +21,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 )
 
 // Runtime points to our systems
@@ -42,6 +47,11 @@ type Runtime struct {
 
 // BuildRuntime initializes our systems
 func BuildRuntime() Runtime {
+	//load .env
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	//init empty context
 	context := context.Background()
 	//init server
@@ -133,6 +143,6 @@ func main() {
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/plants", plantsH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouse/{guid}/stack/{suid}/pot/{puid}/plant", plantH.ServeHTTP)
 	mux.HandleFunc("/users", usersH.ServeHTTP)
-	//todo .env
-	http.ListenAndServe("127.0.1:1234", mux)
+	//todo middleware
+	http.ListenAndServe(fmt.Sprintf("%s:%s", os.Getenv("BACKEND_HOST"), os.Getenv("BACKEND_PORT")), mux)
 }
