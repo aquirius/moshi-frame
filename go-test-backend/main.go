@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
 	greenhouse "test-backend/m/v2/internal/systems/greenhouse"
-	"test-backend/m/v2/internal/systems/notification"
+	notification "test-backend/m/v2/internal/systems/notification"
 	plant "test-backend/m/v2/internal/systems/plant"
 	pot "test-backend/m/v2/internal/systems/pot"
 	sprout "test-backend/m/v2/internal/systems/sprout"
@@ -21,7 +20,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 )
 
 // Runtime points to our systems
@@ -47,11 +45,6 @@ type Runtime struct {
 
 // BuildRuntime initializes our systems
 func BuildRuntime() Runtime {
-	//load .env
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
 	//init empty context
 	context := context.Background()
 	//init server

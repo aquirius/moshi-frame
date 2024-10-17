@@ -7,10 +7,15 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 )
 
 func buildMySQL() string {
-	return fmt.Sprintf("root:%s@%s(%s:%s)/%s", os.Getenv("DB_USER"), os.Getenv("DB_NETWORK"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	return fmt.Sprintf("%s:%s@%s(%s:%s)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_NETWORK"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_PORT"), os.Getenv("MYSQL_DATABASE"))
 }
 
 func (server *Server) connectSQL() *sqlx.DB {
@@ -20,7 +25,9 @@ func (server *Server) connectSQL() *sqlx.DB {
 		fmt.Println(err)
 	}
 
-	defer db.Close()
+	if err := db.Ping(); err != nil {
+		panic(err.Error())
+	}
 
 	return db
 }

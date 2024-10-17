@@ -15,7 +15,8 @@ func buildMySQL() string {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
-	return fmt.Sprintf("root:%s@%s(%s:%s)/%s", os.Getenv("DB_USER"), os.Getenv("DB_NETWORK"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
+
+	return fmt.Sprintf("%s:%s@%s(%s:%s)/%s", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_NETWORK"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_PORT"), os.Getenv("MYSQL_DATABASE"))
 }
 
 func main() {
@@ -25,6 +26,13 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	if err := db.Ping(); err != nil {
+		panic(err.Error())
+	}
+
+	res, err := db.Exec("select * from users;")
+	fmt.Println(res, err)
 
 	greenhouses, err := os.ReadFile("./schemas/greenhouses.sql")
 	if err != nil {
@@ -70,6 +78,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	fmt.Println(buildMySQL())
 
 	out = append(out,
 		string(greenhouses),

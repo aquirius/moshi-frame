@@ -5,12 +5,12 @@ services:
     container_name: sprout-backend
     restart: unless-stopped
     ports:
-      - "3311:3306"
+      - "${MYSQL_PORT}:${MYSQL_TUNNEL}"
     environment:
-      - MYSQL_DATABASE=sprout
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=moshi
-      - MYSQL_ROOT_PASSWORD=moshi
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD={MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_ROOT_HOST=%
     command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
 
@@ -18,7 +18,7 @@ services:
     image: redis:latest
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     environment:
       - REDIS_REPLICATION_MODE=master
-    command: "redis-server --requirepass moshi --port 6379"
+    command: "redis-server --requirepass ${REDIS_PASSWORD} --port ${REDIS_PORT}"
