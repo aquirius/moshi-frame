@@ -11,4 +11,4 @@ CREATE TABLE `notifications` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `notifications_nuid_IDX` (`nuid`) USING BTREE,
   CONSTRAINT `fk_notifications_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

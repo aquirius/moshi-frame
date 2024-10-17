@@ -14,4 +14,4 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_IDX` (`email`) USING BTREE,
   UNIQUE KEY `users_uuid_IDX` (`uuid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

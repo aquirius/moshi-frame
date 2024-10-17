@@ -8,4 +8,4 @@ CREATE TABLE `pots` (
   UNIQUE KEY `pots_puid_IDX` (`puid`) USING BTREE,
   CONSTRAINT `fk_pots_stacks` FOREIGN KEY (`stack_id`) REFERENCES `stacks` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_pots_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

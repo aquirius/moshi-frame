@@ -16,4 +16,4 @@ CREATE TABLE `crops` (
   `water_temp_min` decimal(4,1) NOT NULL,
   `water_temp_max` decimal(4,1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

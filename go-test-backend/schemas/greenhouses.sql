@@ -14,4 +14,4 @@ CREATE TABLE `greenhouses` (
   `co2` decimal(7,2) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `greenhouses_guid_IDX` (`guid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

@@ -7,4 +7,4 @@ CREATE TABLE `plans` (
   `start_ts` int unsigned NOT NULL,
   `end_ts` int unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

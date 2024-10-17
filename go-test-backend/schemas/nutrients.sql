@@ -11,4 +11,4 @@ CREATE TABLE `nutrients` (
   `calcium` int unsigned NOT NULL,
   `magnesium` int unsigned NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

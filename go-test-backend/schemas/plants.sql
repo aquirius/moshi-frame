@@ -13,4 +13,4 @@ CREATE TABLE `plants` (
   CONSTRAINT `fk_plants_crops` FOREIGN KEY (`crop_id`) REFERENCES `crops` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_plants_nutrients` FOREIGN KEY (`nutrient_id`) REFERENCES `nutrients` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_plants_pots` FOREIGN KEY (`pot_id`) REFERENCES `pots` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;

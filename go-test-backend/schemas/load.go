@@ -1,52 +1,30 @@
 package main
 
 import (
-	"bytes"
-	"flag"
 	"fmt"
+	"log"
 	"os"
-	"os/exec"
-	"strings"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
 )
 
-var dbName string
-
-func init() {
-	flag.StringVar(&dbName, "db", "sprout", "moshi")
-	flag.Parse()
-}
-
-func run(name string, cmds []string, stdin []byte) error {
-	cmd := exec.Command(name, cmds...)
-
-	// capture outputs
-	stdout := &bytes.Buffer{}
-	stderr := &bytes.Buffer{}
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
-
-	assembleErr := func(message string, e error) error {
-		return fmt.Errorf("%s: %s\n%s\n%s", message, stdout.String(), stderr.String(), e)
-	}
-
-	// fwd data to execution?
-	if stdin != nil {
-		cmd.Stdin = bytes.NewReader(stdin)
-	}
-
-	err := cmd.Start()
+func buildMySQL() string {
+	err := godotenv.Load(".env")
 	if err != nil {
-		return assembleErr("Failed to start command", err)
+		log.Fatalf("Error loading .env file")
 	}
-
-	if err := cmd.Wait(); err != nil {
-		return assembleErr("Failed to wait for command", err)
-	}
-	return nil
+	return fmt.Sprintf("root:%s@%s(%s:%s)/%s", os.Getenv("DB_USER"), os.Getenv("DB_NETWORK"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_NAME"))
 }
 
 func main() {
 	out := []string{}
+
+	db, err := sqlx.Open("mysql", buildMySQL())
+	if err != nil {
+		panic(err.Error())
+	}
 
 	greenhouses, err := os.ReadFile("./schemas/greenhouses.sql")
 	if err != nil {
@@ -105,30 +83,14 @@ func main() {
 		string(users),
 		string(userGreenhouse),
 		string(sprouts))
-	s := ""
+
 	for _, v := range out {
-		s += v
-		if !strings.HasSuffix(v, ";") {
-			s += ";"
+		res, err := db.Exec(v)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(res)
 		}
-		s += "\n\n"
 	}
-	s = `
-	SET FOREIGN_KEY_CHECKS=0;
-	` + s + `
-	SET FOREIGN_KEY_CHECKS=1;
-	`
-
-	if err := run("docker", []string{
-		"exec",
-		"-i",
-		"sprout-backend",
-		"mysql",
-		"-uroot",
-		"-pmoshi",
-		"sprout",
-	}, []byte(s)); err != nil {
-		fmt.Errorf("failed to load sprout sql schemas: %w", err)
-	}
-
 }
