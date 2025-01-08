@@ -218,7 +218,7 @@ func (l *Notifications) GetCropsSproutRange() *CropsRange {
 	return &cropsRange
 }
 
-//0  0    0 0 69 0 0 0 3262623532 5.5 1000 450 20.3 26.5 0 0 0 0 0 0 0 0 3454994911 lettuce 18 28 60 80 5 6 400 500 800 1200 18 22}
+// 0  0    0 0 69 0 0 0 3262623532 5.5 1000 450 20.3 26.5 0 0 0 0 0 0 0 0 3454994911 lettuce 18 28 60 80 5 6 400 500 800 1200 18 22}
 type MergedCropsPerSprout struct {
 	SproutUID      map[uint64][]int
 	PH             float64 `db:"pH"`
