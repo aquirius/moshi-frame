@@ -111,11 +111,8 @@ func (l *Greenhouses) AddGreenhouseHandler(w http.ResponseWriter, r *http.Reques
 	}
 	reqBody, _ := io.ReadAll(r.Body)
 	json.Unmarshal(reqBody, req)
-	fmt.Println("add greenhouse req", req)
 
 	res, err := l.AddGreenhouseV1(ctx, req)
-	fmt.Println("add greenhouse err", res, err)
-
 	if err != nil {
 		return nil, err
 	}

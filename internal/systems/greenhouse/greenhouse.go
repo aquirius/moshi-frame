@@ -3,7 +3,6 @@ package greenhouse
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
@@ -88,7 +87,6 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get greenhouse")
 		res, err := b.GetGreenhouseHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -98,7 +96,6 @@ func (b *Greenhouse) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(res)
 		return
 	case r.Method == http.MethodPost:
-		fmt.Println("post greenhouse")
 		res, err := b.EditGreenhouseHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -119,7 +116,6 @@ func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get greenhouses")
 		res, err := b.GetGreenhousesHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -133,7 +129,6 @@ func (b *Greenhouses) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post Greenhouse add")
 			res, err = b.AddGreenhouseHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

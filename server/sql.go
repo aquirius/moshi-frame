@@ -22,7 +22,8 @@ func (server *Server) connectSQL() *sqlx.DB {
 	log.Print("connecting with mysql...")
 	db, err := sqlx.Open("mysql", buildMySQL())
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("Error initializing mysql : ", err)
+		return nil
 	}
 
 	if err := db.Ping(); err != nil {

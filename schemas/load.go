@@ -31,9 +31,6 @@ func main() {
 		panic(err.Error())
 	}
 
-	res, err := db.Exec("select * from users;")
-	fmt.Println(res, err)
-
 	greenhouses, err := os.ReadFile("./schemas/greenhouses.sql")
 	if err != nil {
 		panic(err.Error())
@@ -78,8 +75,6 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	fmt.Println(buildMySQL())
 
 	out = append(out,
 		string(greenhouses),

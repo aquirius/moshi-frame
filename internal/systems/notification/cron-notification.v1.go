@@ -286,8 +286,6 @@ func (l *Notifications) CronNotification() error {
 	c := cron.New()
 	cronID, err := c.AddFunc("@every 1h", func() {
 		var query = ""
-
-		fmt.Println("hello")
 		notifications := []Status{}
 
 		query += "SELECT DISTINCT "

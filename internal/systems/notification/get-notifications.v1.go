@@ -31,7 +31,6 @@ func (l *Notifications) GetNotificationsV1(ctx context.Context, p *GetNotificati
 	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
 	userID := user.User.GetUserID(p.UUID)
 	err := l.dbh.Select(&notifications, "SELECT nuid, created_ts, checked_ts, done_ts, title, message FROM notifications WHERE user_id=?;", userID)
-	fmt.Println(err)
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -46,20 +45,17 @@ func (l *Notifications) GetNotificationsHandler(w http.ResponseWriter, r *http.R
 	ctx := context.Background()
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 
-	var redisSession string
 	var err error
 	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
-		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		_, err := l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
 			fmt.Println("token does not exist")
 		} else if err != nil {
 			panic(err)
 		}
 	}
-
-	fmt.Println(redisSession)
 
 	req := &GetNotificationsV1Params{
 		UUID: uuid,

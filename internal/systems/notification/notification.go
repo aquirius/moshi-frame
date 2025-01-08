@@ -3,7 +3,6 @@ package notification
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
@@ -80,7 +79,6 @@ func (notification *Notification) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get plant")
 		res, err := notification.GetNotificationHandler(w, r)
 		if err != nil {
 			if err == sql.ErrNoRows {
@@ -101,7 +99,6 @@ func (notification *Notification) ServeHTTP(w http.ResponseWriter, r *http.Reque
 		method := r.Header.Get("Method")
 		var res []byte
 		var err error
-		fmt.Println(method)
 		if method == "delete" {
 			res, err = notification.DeleteNotificationHandler(w, r)
 			if err != nil {
@@ -127,7 +124,6 @@ func (plants *Notifications) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		method := r.Header.Get("Method")
 		var res []byte
 		var err error
-		fmt.Println(method)
 		if method == "get-many" {
 			res, err = plants.GetNotificationsHandler(w, r)
 			if err != nil {

@@ -69,20 +69,17 @@ func (l *Plants) GetPlantsHandler(w http.ResponseWriter, r *http.Request) ([]byt
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
-	var redisSession string
 	var err error
 	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
-		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		_, err = l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
 			fmt.Println("token does not exist")
 		} else if err != nil {
 			panic(err)
 		}
 	}
-
-	fmt.Println("redisSession", vars["uuid"], redisSession)
 
 	req := &GetPlantsV1Params{}
 	reqBody, _ := io.ReadAll(r.Body)

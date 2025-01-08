@@ -73,12 +73,11 @@ func (l *Greenhouses) GetGreenhousesHandler(w http.ResponseWriter, r *http.Reque
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
-	var redisSession string
 	var err error
 	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
-		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		_, err := l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
 			fmt.Println("token does not exist")
 		} else if err != nil {
@@ -86,7 +85,6 @@ func (l *Greenhouses) GetGreenhousesHandler(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	fmt.Println("redisSession", vars["uuid"], redisSession)
 	uuid, _ := strconv.ParseUint(vars["uuid"], 0, 32)
 	req := &GetGreenhousesV1Params{
 		UUID: uuid,

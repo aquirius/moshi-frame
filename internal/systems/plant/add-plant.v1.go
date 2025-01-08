@@ -98,13 +98,11 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println("test")
 	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
 	// result, err = l.dbh.Exec(query, cuid.ID(), "lettuce", 18, 28, 60, 80, 5.0, 6.0, 400, 500, 800, 1200, 18.0, 22.0)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// fmt.Println(result, err)
 	// cuid, err = uuid.NewUUID()
 	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
 	// result, err = l.dbh.Exec(query, cuid.ID(), "tomato", 18, 26, 50, 70, 5.5, 6.5, 400, 500, 700, 1100, 19.0, 24.0)
@@ -118,8 +116,7 @@ func (l *Plant) AddPlantV1(ctx context.Context, p *AddPlantV1Params) (*AddPlantV
 	if err != nil {
 		return nil, err
 	}
-	plantID, err := result.LastInsertId()
-	fmt.Println("last inser id of plant", plantID)
+	_, err = result.LastInsertId()
 
 	return &AddPlantV1Result{PLUID: uint64(pluid.ID())}, nil
 }

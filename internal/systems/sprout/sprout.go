@@ -3,10 +3,8 @@ package sprout
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
@@ -53,7 +51,6 @@ func (b *Sprout) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer conn.Close()
-	
 
 	req := &GetSproutV1Params{
 		SUID: 123123213,
@@ -68,11 +65,6 @@ func (b *Sprout) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		log.Println("Write error:", err)
 	}
 
-	fmt.Println("test")
-
-	time.Sleep(time.Second)
-	fmt.Println("test2")
-
 	reqq := &GetSproutV1Params{
 		SUID: 65656556,
 	}
@@ -85,6 +77,7 @@ func (b *Sprout) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Write error:", err)
 	}
+	// TODO :
 	// Read messages in a loop and echo them back
 	// for {
 	// 	// Read message from the WebSocket
@@ -114,7 +107,6 @@ func (sprout *Sprout) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("post sprout get")
 		res, err := sprout.GetSproutHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -128,7 +120,6 @@ func (sprout *Sprout) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post sprout add")
 			res, err = sprout.AddSproutHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -137,7 +128,6 @@ func (sprout *Sprout) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if method == "get" {
-			fmt.Println("post sprout get")
 			res, err = sprout.GetSproutHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

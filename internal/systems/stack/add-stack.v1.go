@@ -56,12 +56,11 @@ func (l *Stack) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
-	var redisSession string
 	var err error
 	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
-		redisSession, err = l.rdb.Get(ctx, cookie.Value).Result()
+		_, err = l.rdb.Get(ctx, cookie.Value).Result()
 		if err == redis.Nil {
 			fmt.Println("token does not exist")
 		} else if err != nil {
@@ -69,7 +68,6 @@ func (l *Stack) AddStackHandler(w http.ResponseWriter, r *http.Request) ([]byte,
 		}
 	}
 
-	fmt.Println("redisSession", vars["guid"], redisSession)
 	guid, _ := strconv.ParseUint(vars["guid"], 0, 32)
 	req := &AddStackV1Params{
 		GUID: guid,

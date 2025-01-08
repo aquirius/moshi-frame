@@ -116,7 +116,6 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get users")
 		res, err := users.GetUsersHandler(w, r)
 		if err != nil && err.Error() == "not logged in" {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -126,7 +125,6 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(res)
 		return
 	case r.Method == http.MethodPut:
-		fmt.Println("edit user")
 		res, err := users.EditUserHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -136,7 +134,6 @@ func (users *Users) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(res)
 		return
 	case r.Method == http.MethodDelete:
-		fmt.Println("delete user")
 		res, err := users.DeleteUserHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -157,7 +154,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get user")
 		res, err := user.GetUserHandler(w, r)
 		if err != nil && err.Error() == "not logged in" {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -175,7 +171,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "login" {
-			fmt.Println("post user login")
 			res, err = user.LoginUserHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -185,7 +180,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if method == "logout" {
-			fmt.Println("post user logout")
 			res, err = user.LogoutUserHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -195,7 +189,6 @@ func (user *User) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if method == "register" {
-			fmt.Println("post user register")
 			res, err = user.RegisterUserHandler(w, r)
 			if err != nil {
 				if err.Error() == "display name already taken" {

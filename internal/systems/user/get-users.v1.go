@@ -38,7 +38,6 @@ func (l *Users) GetUsersV1(p *GetUsersV1Params) (*GetUsersV1Result, error) {
 
 	err := l.dbh.Select(&users, "SELECT uuid, registered_ts, display_name, first_name, last_name, email, birthday FROM users;")
 	if err == sql.ErrNoRows {
-		fmt.Println("no rows")
 		return nil, err
 	}
 

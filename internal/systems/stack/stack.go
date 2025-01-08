@@ -3,7 +3,6 @@ package stack
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
@@ -45,14 +44,13 @@ func (l *Stack) GetStackID(suid uint64) int {
 	return id
 }
 
-//serves user methods
+// serves user methods
 func (stack *Stack) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
 	case r.Method == http.MethodGet:
-		fmt.Println("get stacks")
 		res, err := stack.GetStacksHandler(w, r)
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
@@ -67,7 +65,6 @@ func (stack *Stack) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post stack add")
 			res, err = stack.AddStackHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

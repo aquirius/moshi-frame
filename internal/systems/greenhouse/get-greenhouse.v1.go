@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -43,13 +42,11 @@ type GetGreenhouseV1Result struct {
 // GetUserV1 gets user by uuid
 func (l *Greenhouse) GetGreenhouseV1(ctx context.Context, p *GetGreenhouseV1Params) (*GetGreenhouseV1Result, error) {
 	greenhouse := GetGreenhouse{}
-	v := ctx.Value("greenhouse_id")
+	//v := ctx.Value("greenhouse_id")
 	err := l.dbh.Get(&greenhouse, "SELECT guid, display_name, address, zip, status, destination, tempIn, tempOut, humidity, brightness, co2 FROM greenhouses WHERE guid=?;", p.GUID)
 	if err == sql.ErrNoRows {
 		return nil, err
 	}
-
-	fmt.Println("context greenhouse_id", v, greenhouse)
 
 	return &GetGreenhouseV1Result{Greenhouse: greenhouse}, nil
 }
