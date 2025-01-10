@@ -38,8 +38,8 @@ This project is a web application designed to help users manage greenhouse envir
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/aquirius/moshi-frame.git
-   cd moshi-frame/go-test-backend
+   git clone https://github.com/aquirius/sprout-frame.git
+   cd sprout-frame
 
 2. **Add .env file**:
     ```txt
