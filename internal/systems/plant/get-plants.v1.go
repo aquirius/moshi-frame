@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	redis "github.com/go-redis/redis/v8"
-	"github.com/gorilla/mux"
 )
 
 // GetUserV1Params
@@ -65,7 +64,7 @@ func (l *Plants) GetPlantsV1(ctx context.Context, p *GetPlantsV1Params) (*GetPla
 
 // GetUserHandler handles get user request
 func (l *Plants) GetPlantsHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
-	vars := mux.Vars(r)
+	//vars := mux.Vars(r)
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 

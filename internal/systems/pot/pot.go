@@ -3,7 +3,6 @@ package pot
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-redis/redis/v8"
@@ -58,7 +57,6 @@ func (pot *Pot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			fmt.Println("post pot add")
 			res, err = pot.AddPotHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -67,7 +65,6 @@ func (pot *Pot) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if method == "get" {
-			fmt.Println("post pot get")
 			res, err = pot.GetPotsHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

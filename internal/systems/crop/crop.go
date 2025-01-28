@@ -1,4 +1,4 @@
-package plant
+package crop
 
 import (
 	"context"
@@ -9,58 +9,58 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// PlantProvider provides *Plant
-type PlantProvider struct {
-	Plant *Plant
+// CropProvider provides *Crop
+type CropProvider struct {
+	Crop *Crop
 }
 
-// Plant is capable of providing core access
-type Plant struct {
+// Crop is capable of providing core access
+type Crop struct {
 	dbh *sqlx.DB
 	rdb *redis.Client
 }
 
 // NewCoreProvider returns a new Core provider
-func NewPlantProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *PlantProvider {
-	return &PlantProvider{
-		&Plant{
+func NewCropProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *CropProvider {
+	return &CropProvider{
+		&Crop{
 			dbh: dbh,
 			rdb: rdb,
 		},
 	}
 }
 
-// PlantProvider provides *Plant
-type PlantsProvider struct {
-	Plants *Plants
+// CropProvider provides *Crop
+type CropsProvider struct {
+	Crops *Crops
 }
 
-// Plant is capable of providing core access
-type Plants struct {
+// Crop is capable of providing core access
+type Crops struct {
 	dbh *sqlx.DB
 	rdb *redis.Client
 }
 
 // NewCoreProvider returns a new Core provider
-func NewPlantsProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *PlantsProvider {
-	return &PlantsProvider{
-		&Plants{
+func NewCropsProvider(ctx context.Context, dbh *sqlx.DB, rdb *redis.Client, urlPrefixBackend string) *CropsProvider {
+	return &CropsProvider{
+		&Crops{
 			dbh: dbh,
 			rdb: rdb,
 		},
 	}
 }
 
-func (b *PlantProvider) NewPlant() *Plant {
-	return b.Plant
+func (b *CropProvider) NewCrop() *Crop {
+	return b.Crop
 }
 
-func (b *PlantsProvider) NewPlants() *Plants {
-	return b.Plants
+func (b *CropsProvider) NewCrops() *Crops {
+	return b.Crops
 }
 
-func (l *Plant) GetPlantID(pluid uint64) int {
-	var query = "SELECT id FROM plants WHERE pluid=?;"
+func (l *Crop) GetCropID(pluid uint64) int {
+	var query = "SELECT id FROM crops WHERE pluid=?;"
 	var id int
 	err := l.dbh.Get(&id, query, pluid)
 	if err != nil && err == sql.ErrNoRows {
@@ -69,28 +69,8 @@ func (l *Plant) GetPlantID(pluid uint64) int {
 	return id
 }
 
-func (l *Plant) GetPotID(puid uint64) int {
-	var query = "SELECT id FROM pots WHERE puid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, puid)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
-func (l *Plants) GetPotID(puid uint64) int {
-	var query = "SELECT id FROM pots WHERE puid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, puid)
-	if err != nil && err == sql.ErrNoRows {
-		return 0
-	}
-	return id
-}
-
 // serves user methods
-func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (crop *Crop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
@@ -100,15 +80,7 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "add" {
-			res, err = plant.AddPlantHandler(w, r)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(err.Error()))
-				return
-			}
-		}
-		if method == "harvest" {
-			res, err = plant.HarvestPlantHandler(w, r)
+			res, err = crop.AddCropHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))
@@ -119,7 +91,7 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Write(res)
 		return
 	case r.Method == http.MethodGet:
-		res, err := plant.GetPlantHandler(w, r)
+		res, err := crop.GetCropHandler(w, r)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				w.WriteHeader(http.StatusOK)
@@ -139,7 +111,7 @@ func (plant *Plant) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (plants *Plants) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (crops *Crops) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
@@ -149,7 +121,7 @@ func (plants *Plants) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var res []byte
 		var err error
 		if method == "get-many" {
-			res, err = plants.GetPlantsHandler(w, r)
+			res, err = crops.GetCropsHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))

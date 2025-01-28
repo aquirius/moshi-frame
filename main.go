@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	crop "test-backend/m/v2/internal/systems/crop"
 	greenhouse "test-backend/m/v2/internal/systems/greenhouse"
 	notification "test-backend/m/v2/internal/systems/notification"
 	plant "test-backend/m/v2/internal/systems/plant"
@@ -24,15 +25,20 @@ import (
 
 // Runtime points to our systems
 type Runtime struct {
-	db     *sqlx.DB
-	rdb    *redis.Client
-	user   *user.User
-	users  *user.Users
+	db  *sqlx.DB
+	rdb *redis.Client
+
+	user  *user.User
+	users *user.Users
+
 	plant  *plant.Plant
 	plants *plant.Plants
 
 	pot   *pot.Pot
 	stack *stack.Stack
+
+	crop  *crop.Crop
+	crops *crop.Crops
 
 	greenhouse  *greenhouse.Greenhouse
 	greenhouses *greenhouse.Greenhouses
@@ -62,6 +68,12 @@ func BuildRuntime() Runtime {
 	//init plant
 	plantProvider := plant.NewPlantProvider(context, &server.Sql, &server.Redis, "sql")
 	plant := plantProvider.NewPlant()
+	//init crops
+	cropsProvider := crop.NewCropsProvider(context, &server.Sql, &server.Redis, "sql")
+	crops := cropsProvider.NewCrops()
+	//init crop
+	cropProvider := crop.NewCropProvider(context, &server.Sql, &server.Redis, "sql")
+	crop := cropProvider.NewCrop()
 	//init pot
 	potProvider := pot.NewPotProvider(context, &server.Sql, &server.Redis, "sql")
 	pot := potProvider.NewPot()
@@ -94,6 +106,9 @@ func BuildRuntime() Runtime {
 		plant:  plant,
 		plants: plants,
 
+		crop:  crop,
+		crops: crops,
+
 		pot:           pot,
 		stack:         stack,
 		greenhouse:    greenhouse,
@@ -114,6 +129,8 @@ func main() {
 	usersH := rt.users
 	plantH := rt.plant
 	plantsH := rt.plants
+	cropH := rt.crop
+	cropsH := rt.crops
 	potH := rt.pot
 	stackH := rt.stack
 	greenhouseH := rt.greenhouse
@@ -126,6 +143,8 @@ func main() {
 	mux.HandleFunc("/logout", userH.ServeHTTP)
 	mux.HandleFunc("/register", userH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}", userH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/crops", cropsH.ServeHTTP)
+	mux.HandleFunc("/user/{uuid}/crop/{cuid}", cropH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/notifications", notificationsH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/notification/{nuid}", notificationH.ServeHTTP)
 	mux.HandleFunc("/user/{uuid}/greenhouses", greenhousesH.ServeHTTP)
