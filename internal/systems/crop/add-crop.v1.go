@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"test-backend/m/v2/internal/systems/user"
 
 	redis "github.com/go-redis/redis/v8"
 	"github.com/google/uuid"
@@ -15,24 +16,43 @@ import (
 
 // AddCrop
 type AddCrop struct {
-	PLUID       string `db:"pluid"`
-	TS          string `db:"registered_ts"`
-	DisplayName string `db:"display_name"`
-	FirstName   string `db:"first_name"`
-	LastName    string `db:"last_name"`
-	Email       string `db:"email"`
-	Birthday    string `db:"birthday"`
+	CUID         uint64  `db:"cuid"`
+	CropName     string  `db:"crop_name"`
+	AirTempMin   float64 `db:"air_temp_min"`
+	AirTempMax   float64 `db:"air_temp_max"`
+	HumidityMin  float64 `db:"humidity_min"`
+	HumidityMax  float64 `db:"humidity_max"`
+	PHLevelMin   float64 `db:"ph_level_min"`
+	PHLevelMax   float64 `db:"ph_level_max"`
+	OrpMin       float64 `db:"orp_min"`
+	OrpMax       float64 `db:"orp_max"`
+	TdsMin       uint16  `db:"tds_min"`
+	TdsMax       uint16  `db:"tds_max"`
+	WaterTempMin float64 `db:"water_temp_min"`
+	WaterTempMax float64 `db:"water_temp_max"`
 }
 
 // AddCropV1Params
 type AddCropV1Params struct {
-	PUID     uint64 `json:"puid"`
-	CropName string `json:"cropName"`
+	UUID         uint64  `json:"uuid"`
+	CropName     string  `json:"cropName"`
+	AirTempMin   float64 `json:"airTempMin"`
+	AirTempMax   float64 `json:"airTempMax"`
+	HumidityMin  float64 `json:"humidityMin"`
+	HumidityMax  float64 `json:"humidityMax"`
+	PHLevelMin   float64 `json:"phLevelMin"`
+	PHLevelMax   float64 `json:"phLevelMax"`
+	OrpMin       float64 `json:"orpMin"`
+	OrpMax       float64 `json:"orpMax"`
+	TdsMin       uint16  `json:"tdsMin"`
+	TdsMax       uint16  `json:"tdsMax"`
+	WaterTempMin float64 `json:"waterTempMin"`
+	WaterTempMax float64 `json:"waterTempMax"`
 }
 
 // AddCropV1Result
 type AddCropV1Result struct {
-	PLUID uint64 `json:"pluid"`
+	CUID uint64 `json:"cuid"`
 }
 
 func (l *Crop) existingCUID(uuid uint32) bool {
@@ -45,81 +65,53 @@ func (l *Crop) existingCUID(uuid uint32) bool {
 	return true
 }
 
-func (l *Crop) existingPUID(uuid uint32) bool {
-	var query = "SELECT id FROM pots WHERE puid=?;"
-	var id int
-	err := l.dbh.Get(&id, query, uuid)
-	if err != nil && err == sql.ErrNoRows {
-		return false
-	}
-	return true
-}
-
-func (l *Crop) GetCropIDByName(name string) int64 {
-	// for some reason i cant get the right crop by crop name
-	// var query = "SELECT id FROM crops WHERE crop_name=?;"
-	// var id int64
-	// err := l.dbh.Get(&id, query, id)
-	// if err != nil && err == sql.ErrNoRows {
-	// 	return 0
-	// }
-	// return id
-	if name == "tomato" {
-		return 2
-	} else {
-		return 1
-	}
-}
-
 // GetUserV1 gets user by uuid
-func (l *Crop) AddCropV1(ctx context.Context, p *AddCropV1Params) (*AddCropV1Result, error) {
+func (l *Crops) AddCropV1(ctx context.Context, p *AddCropV1Params) (*AddCropV1Result, error) {
 	var query string
 	var err error
-	//var result sql.Result
-	//var nutrientID int64
-	var pluid uuid.UUID
-	//var cuid uuid.UUID
+	var result sql.Result
+	var ucuid uuid.UUID
+	var cuid uuid.UUID
 
-	pluid, err = uuid.NewUUID()
-	//cuid, err := uuid.NewUUID()
+	user := user.NewUserProvider(ctx, l.dbh, l.rdb, "")
+	userID := user.User.GetUserID(p.UUID)
 
-	//userID := ctx.Value("user_id")
-	//userID := l.getUserID(p.UUID)
-	//potID := l.GetPotID(p.PUID)
-	//cropID := l.GetCropIDByName(p.CropName)
-
-	query = "INSERT INTO nutrients (carbon, hydrogen, oxygen, nitrogen, phosphorus, potassium, sulfur, calcium, magnesium) VALUES (?,?,?,?,?,?,?,?,?);"
-	_, err = l.dbh.Exec(query, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+	ucuid, err = uuid.NewUUID()
 	if err != nil {
 		return nil, err
 	}
-	// nutrientID, err = result.LastInsertId()
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-	// result, err = l.dbh.Exec(query, cuid.ID(), "lettuce", 18, 28, 60, 80, 5.0, 6.0, 400, 500, 800, 1200, 18.0, 22.0)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// cuid, err = uuid.NewUUID()
-	// query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
-	// result, err = l.dbh.Exec(query, cuid.ID(), "tomato", 18, 26, 50, 70, 5.5, 6.5, 400, 500, 700, 1100, 19.0, 24.0)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// cropID, err = result.LastInsertId()
 
-	return &AddCropV1Result{PLUID: uint64(pluid.ID())}, nil
+	cuid, err = uuid.NewUUID()
+	if err != nil {
+		return nil, err
+	}
+
+	query = "INSERT INTO crops (cuid, crop_name, air_temp_min, air_temp_max, humidity_min, humidity_max, ph_level_min, ph_level_max, orp_min, orp_max, tds_min, tds_max, water_temp_min, water_temp_max) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
+	result, err = l.dbh.Exec(query, cuid.ID(), p.CropName, p.AirTempMin, p.AirTempMax, p.HumidityMin, p.HumidityMax, p.PHLevelMin, p.PHLevelMax, p.OrpMin, p.OrpMax, p.TdsMin, p.TdsMax, p.WaterTempMin, p.WaterTempMax)
+	if err != nil {
+		return nil, err
+	}
+
+	cropID, err := result.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	query = "INSERT INTO users_crops (ucuid, user_id, crop_id) VALUES (?,?,?);"
+	_, err = l.dbh.Exec(query, ucuid, userID, cropID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AddCropV1Result{CUID: uint64(cuid.ID())}, nil
 }
 
-// GetUserHandler handles get user request
-func (l *Crop) AddCropHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+// AddCropHandler handles add crop request
+func (l *Crops) AddCropHandler(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	cookie, _ := r.Cookie("session-id")
 	ctx := context.Background()
 
 	var err error
-	//if we have a session id store it to req body
 	if cookie != nil && cookie.Value != "" {
 		ctx = context.WithValue(ctx, "session-id", cookie.Value)
 		//todo

@@ -75,21 +75,6 @@ func (crop *Crop) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type,access-control-allow-origin, access-control-allow-headers")
 	switch {
-	case r.Method == http.MethodPost:
-		method := r.Header.Get("Method")
-		var res []byte
-		var err error
-		if method == "add" {
-			res, err = crop.AddCropHandler(w, r)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(err.Error()))
-				return
-			}
-		}
-		w.WriteHeader(http.StatusOK)
-		w.Write(res)
-		return
 	case r.Method == http.MethodGet:
 		res, err := crop.GetCropHandler(w, r)
 		if err != nil {
@@ -122,6 +107,14 @@ func (crops *Crops) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		var err error
 		if method == "get-many" {
 			res, err = crops.GetCropsHandler(w, r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				w.Write([]byte(err.Error()))
+				return
+			}
+		}
+		if method == "add" {
+			res, err = crops.AddCropHandler(w, r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
 				w.Write([]byte(err.Error()))
